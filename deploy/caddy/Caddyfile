@@ -1,0 +1,118 @@
+# ==========================================================================
+# Caddy-Konfiguration für Kirby – Vorlage
+#
+# deploy/server-setup.sh ersetzt die Platzhalter in doppelten geschweiften
+# Klammern, hängt die Site-Blöcke der aktuellen Phase an und schreibt das
+# Ergebnis nach /etc/caddy/Caddyfile. Dort nichts von Hand ändern.
+#
+# Verzeichnisse:
+#   {{APP_DIR}}/     Programmcode (index.php, kirby/, site/, assets/) – nur lesbar
+#   {{DATA_DIR}}/    Inhalte, Konten, Sitzungen, Cache, Medien – schreibt PHP
+#   {{KIRBY_SOCKET}} PHP-FPM-Pool für Kirby (deploy/php/kirby-pool.conf)
+#
+# Öffentlich ausgeliefert werden nur /assets/ und /media/. Alles andere
+# beantwortet Kirby über index.php – content/, site/, kirby/ und vendor/
+# sind nie direkt erreichbar (zusätzlich ausdrücklich gesperrt).
+#
+# Prüfen:   sudo caddy validate --config /etc/caddy/Caddyfile
+# Anleitung: docs/deployment.md
+# ==========================================================================
+{
+	email {{ACME_EMAIL}}
+}
+
+(site) {
+	encode zstd gzip
+
+	# Uploads im Panel (PHP erlaubt 12 MB)
+	request_body {
+		max_size 12MB
+	}
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		-Server
+		-X-Powered-By
+		# Erst aktivieren, wenn HTTPS dauerhaft für alle Subdomains steht:
+		# Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+
+	# Website: nur eigene Dateien, keine Inline-Skripte; einbetten nur im
+	# eigenen Panel (Seitenvorschau)
+	@frontend not path /panel /panel/* /api /api/*
+	header @frontend Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+
+	# Kirby-Panel: braucht Inline-Styles und -Skripte (Vue)
+	@backend path /panel /panel/* /api /api/*
+	header @backend Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+	header @backend Cache-Control "no-store"
+
+	route {
+		# Versteckte Dateien (.git, .env …) nie ausliefern – außer .well-known
+		@hidden {
+			path */.*
+			not path /.well-known/*
+		}
+		respond @hidden 404
+
+		# Interne Verzeichnisse und Dateien ausdrücklich sperren
+		@internal path /content/* /site/* /kirby/* /vendor/* /bin/* /tests/* /deploy/* /docs/* /tools/* /storage/* /data/* /config/* /composer.json /composer.lock /*.md /*.env
+		respond @internal 404
+
+		# Statische Dateien aus dem Programmcode
+		handle /assets/* {
+			root * {{APP_DIR}}
+			@script path *.php *.phtml *.phar
+			respond @script 404
+			header Cache-Control "public, max-age=604800"
+			file_server
+		}
+
+		# Medien: vorhandene Dateien direkt, fehlende Vorschaubilder erzeugt Kirby
+		handle /media/* {
+			root * {{DATA_DIR}}
+			@exists file
+			handle @exists {
+				@mediascript path *.php *.phtml *.phar
+				respond @mediascript 404
+				header Cache-Control "public, max-age=31536000, immutable"
+				file_server
+			}
+			handle {
+				root * {{APP_DIR}}
+				rewrite * /index.php
+				php_fastcgi unix/{{KIRBY_SOCKET}}
+			}
+		}
+
+		# Alles andere beantwortet Kirby
+		handle {
+			root * {{APP_DIR}}
+			rewrite * /index.php
+			php_fastcgi unix/{{KIRBY_SOCKET}}
+		}
+	}
+
+	# Zugriffsprotokoll: IP-Adressen gekürzt (IPv4 /24, IPv6 /48), ohne
+	# Cookie- und Authorization-Header. Aufbewahrung 14 Tage (logrotate).
+	log {
+		output file /var/log/caddy/{args[0]}.log {
+			roll_disabled
+		}
+		format filter {
+			request>remote_ip ip_mask 24 48
+			request>client_ip ip_mask 24 48
+			request>headers>Cookie delete
+			request>headers>Authorization delete
+			resp_headers>Set-Cookie delete
+		}
+	}
+}
+
+# Die Site-Blöcke hängt deploy/server-setup.sh je nach SITE_PHASE an:
+#   preview → preview.caddy
+#   live    → live.caddy (+ preview-redirect.caddy, wenn PREVIEW_HOST gesetzt)

@@ -1,0 +1,14 @@
+# Installiert von deploy/server-setup.sh nach /etc/systemd/system/
+# Läuft als root, baut aber selbst als BUILD_USER (siehe deploy/site-update.sh).
+# Einstellungen liest das Skript selbst aus /etc/default/site-update.
+[Unit]
+Description=Kirby-Website aus GitHub aktualisieren
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/site-update
+# Build darf dauern, aber nicht hängen bleiben
+TimeoutStartSec=15min
+Nice=10

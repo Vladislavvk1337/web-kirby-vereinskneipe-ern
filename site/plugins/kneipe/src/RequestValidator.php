@@ -114,7 +114,7 @@ final class RequestValidator
 		}
 
 		foreach (self::FIELDS as $field => $max) {
-			if (mb_strlen((string)($input[$field] ?? '')) > $max * 2) {
+			if (is_string($input[$field] ?? null) && mb_strlen($input[$field]) > $max * 2) {
 				$errors[$field] = 'Dieser Text ist zu lang.';
 			}
 		}

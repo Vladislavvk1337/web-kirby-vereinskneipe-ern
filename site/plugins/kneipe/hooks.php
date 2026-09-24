@@ -46,6 +46,25 @@ $actor = function (): string {
 
 $tracked = ['event', 'team', 'article'];
 
+/**
+ * Aktion ablehnen. Kirby setzt seinen Schutz vor Hook-Endlosschleifen
+ * (Events::$processed/$level) nicht zurück, wenn ein Hook eine Ausnahme
+ * wirft – derselbe Hook würde danach im selben PHP-Prozess übersprungen.
+ * Deshalb wird der Zustand vor dem Ablehnen zurückgesetzt, damit die
+ * Prüfung bei jedem weiteren Versuch erneut greift.
+ */
+$deny = function (string $message): never {
+	$reset = function () {
+		$this->level     = 0;
+		$this->processed = [];
+	};
+
+	$events = (fn () => $this->events)->call(App::instance());
+	$reset->call($events);
+
+	throw new PermissionException(message: $message);
+};
+
 /** Metadaten und Protokoll speichern, ohne weitere Hooks auszulösen */
 $writeMeta = function (Page $page, array $data): Page {
 	return App::instance()->impersonate('kirby', fn () => $page->save($data));
@@ -68,13 +87,13 @@ $logEntry = function (Page $page, string $what, string $note = '') use ($actor, 
  * Bestätigen/Veröffentlichen nur ohne ungelöste Überschneidung.
  * $data enthält die neuen, noch nicht gespeicherten Werte.
  */
-$assertPublishable = function (Page $page, array $data, bool $accepted): void {
+$assertPublishable = function (Page $page, array $data, bool $accepted) use ($deny): void {
 	if ($page->timestampFrom('start', $data) === null) {
-		throw new PermissionException(message: 'Bitte zuerst den Beginn des Termins eintragen.');
+		$deny('Bitte zuerst den Beginn des Termins eintragen.');
 	}
 
 	if (Workflow::canPublishWithConflicts($page->conflicts($data)->count(), $accepted) === false) {
-		throw new PermissionException(message: 'Doppelbelegung: ' . $page->conflictInfo($data));
+		$deny('Doppelbelegung: ' . $page->conflictInfo($data));
 	}
 };
 
@@ -85,11 +104,11 @@ return [
 	// ---------------------------------------------------------------------
 	// Termine: organisatorischen Status und Überschneidungen prüfen
 	// ---------------------------------------------------------------------
-	'page.update:before' => function (Page $page, array $values, array $strings) use ($role, $assertPublishable) {
+	'page.update:before' => function (Page $page, array $values, array $strings) use ($deny, $role, $assertPublishable) {
 		$template = $page->intendedTemplate()->name();
 
 		if (in_array($template, ['legal', 'home', 'about', 'join', 'contact', 'requestform', 'events', 'teams', 'news'], true) === true && Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Diese Seite darf nur die Administration bearbeiten.');
+			$deny('Diese Seite darf nur die Administration bearbeiten.');
 		}
 
 		if ($template !== 'event') {
@@ -101,9 +120,7 @@ return [
 		$approval = kneipe()->approvalMode();
 
 		if (Workflow::canSetOrgStatus($role(), $approval, $from, $to) === false) {
-			throw new PermissionException(
-				message: 'Im Freigabemodus dürfen nur Administratoren Termine bestätigen oder veröffentlichen. Bitte setzt den Status auf „zur Freigabe“.'
-			);
+			$deny('Im Freigabemodus dürfen nur Administratoren Termine bestätigen oder veröffentlichen. Bitte setzt den Status auf „zur Freigabe“.');
 		}
 
 		$acceptedBefore = $page->content()->get('conflictaccepted')->toBool();
@@ -112,7 +129,7 @@ return [
 			: $acceptedBefore;
 
 		if ($accepted !== $acceptedBefore && Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Überschneidungen darf nur die Administration zulassen.');
+			$deny('Überschneidungen darf nur die Administration zulassen.');
 		}
 
 		// Beim Bestätigen/Veröffentlichen darf keine Überschneidung unbemerkt
@@ -162,11 +179,11 @@ return [
 	// ---------------------------------------------------------------------
 	// Veröffentlichen: Freigabemodus und Doppelbelegung
 	// ---------------------------------------------------------------------
-	'page.changeStatus:before' => function (Page $page, string $status) use ($role, $assertPublishable) {
+	'page.changeStatus:before' => function (Page $page, string $status) use ($deny, $role, $assertPublishable) {
 		$template = $page->intendedTemplate()->name();
 
 		if ($template === 'request') {
-			throw new PermissionException(message: 'Anfragen werden nie veröffentlicht.');
+			$deny('Anfragen werden nie veröffentlicht.');
 		}
 
 		if ($template !== 'event') {
@@ -174,9 +191,7 @@ return [
 		}
 
 		if (Workflow::canChangePublicationStatus($role(), kneipe()->approvalMode()) === false) {
-			throw new PermissionException(
-				message: 'Im Freigabemodus veröffentlicht die Administration. Bitte setzt den Termin auf „zur Freigabe“.'
-			);
+			$deny('Im Freigabemodus veröffentlicht die Administration. Bitte setzt den Termin auf „zur Freigabe“.');
 		}
 
 		if ($status !== 'draft') {
@@ -201,50 +216,50 @@ return [
 		$logEntry($page, 'Veröffentlichung: ' . ($newPage->isDraft() ? 'zurück zum Entwurf' : 'veröffentlicht'));
 	},
 
-	'page.delete:before' => function (Page $page) use ($role) {
+	'page.delete:before' => function (Page $page) use ($deny, $role) {
 		$template = $page->intendedTemplate()->name();
 
 		if ($template === 'event' && Workflow::canDeleteEvent($role(), $page->isDraft()) === false) {
-			throw new PermissionException(message: 'Veröffentlichte Termine kann nur die Administration löschen. Tipp: Status „abgesagt“ oder „archiviert“ setzen.');
+			$deny('Veröffentlichte Termine kann nur die Administration löschen. Tipp: Status „abgesagt“ oder „archiviert“ setzen.');
 		}
 
 		if ($template === 'request' && Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Anfragen kann nur die Administration löschen.');
+			$deny('Anfragen kann nur die Administration löschen.');
 		}
 	},
 
 	'page.delete:after' => fn () => Service::flush(),
 
-	'page.create:before' => function (Page $page) use ($role) {
+	'page.create:before' => function (Page $page) use ($deny, $role) {
 		if ($page->intendedTemplate()->name() === 'request' && Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Anfragen entstehen nur über das öffentliche Formular.');
+			$deny('Anfragen entstehen nur über das öffentliche Formular.');
 		}
 	},
 
 	// ---------------------------------------------------------------------
 	// Benutzer und Einstellungen: nur Administration
 	// ---------------------------------------------------------------------
-	'user.create:before' => function (User $user) use ($role) {
+	'user.create:before' => function (User $user) use ($deny, $role) {
 		if (Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Benutzerkonten legt nur die Administration an.');
+			$deny('Benutzerkonten legt nur die Administration an.');
 		}
 	},
 
-	'user.changeRole:before' => function (User $user) use ($role) {
+	'user.changeRole:before' => function (User $user) use ($deny, $role) {
 		if (Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Rollen ändert nur die Administration.');
+			$deny('Rollen ändert nur die Administration.');
 		}
 	},
 
-	'user.delete:before' => function (User $user) use ($role) {
+	'user.delete:before' => function (User $user) use ($deny, $role) {
 		if (Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Benutzerkonten löscht nur die Administration.');
+			$deny('Benutzerkonten löscht nur die Administration.');
 		}
 	},
 
-	'site.update:before' => function () use ($role) {
+	'site.update:before' => function () use ($deny, $role) {
 		if (Workflow::isPrivileged($role()) === false) {
-			throw new PermissionException(message: 'Stammdaten und Einstellungen pflegt nur die Administration.');
+			$deny('Stammdaten und Einstellungen pflegt nur die Administration.');
 		}
 	},
 ];

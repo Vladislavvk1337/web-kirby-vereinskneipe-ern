@@ -1,0 +1,2 @@
+# Variablen werden indirekt genutzt (config.env, envsubst in render_template)
+disable=SC2034

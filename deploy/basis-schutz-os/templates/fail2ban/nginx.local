@@ -1,0 +1,9 @@
+# Verwaltet von basis-schutz-os
+# Sperrt IPs, die wiederholt das Rate-Limit der PHP-API (limit_req) reißen.
+[nginx-limit-req]
+enabled  = true
+backend  = auto
+port     = http,https
+logpath  = /var/log/nginx/error.log
+findtime = 10m
+maxretry = 10

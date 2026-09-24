@@ -1,0 +1,18 @@
+# Verwaltet von basis-schutz-os
+[DEFAULT]
+# Wiederholungstäter werden immer länger gesperrt (max. 1 Woche)
+bantime  = 1h
+bantime.increment = true
+bantime.maxtime   = 1w
+findtime = 10m
+maxretry = 5
+banaction          = nftables-multiport
+banaction_allports = nftables-allports
+ignoreip = 127.0.0.1/8 ::1 ${FAIL2BAN_IGNOREIP}
+
+[sshd]
+enabled  = true
+backend  = systemd
+port     = ${SSH_PORT}
+mode     = aggressive
+maxretry = 3

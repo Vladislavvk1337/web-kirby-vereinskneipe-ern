@@ -1,0 +1,84 @@
+name: basis-schutz-os aktualisieren
+
+# Holt den neuesten Stand von basis-schutz-os (Repository und Branch siehe
+# env unten) nach deploy/basis-schutz-os/ und committet ihn, sobald er sich
+# geändert hat. Der Server übernimmt den Commit mit der nächsten Aktualisierung.
+#
+# Benötigt das Secret BASIS_SCHUTZ_TOKEN mit Lesezugriff auf basis-schutz-os.
+# Ohne Secret wird der Lauf übersprungen (z. B. direkt nach dem Anlegen eines
+# Projekts aus der Vorlage).
+# Einrichtung: Deployment.md, Abschnitt „basis-schutz-os aktuell halten".
+
+on:
+  schedule:
+    - cron: '17 * * * *' # stündlich
+  workflow_dispatch:
+  # Sofort auslösen, wenn basis-schutz-os einen Push meldet (optional)
+  repository_dispatch:
+    types: [basis-schutz-os-aktualisiert]
+
+permissions:
+  contents: write
+
+env:
+  UPSTREAM_REPO: Vladislavvk1337/basis-schutz-os
+  UPSTREAM_REF: main
+
+concurrency:
+  group: basis-schutz-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Übernehmen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Secret vorhanden?
+        id: token
+        env:
+          TOKEN: ${{ secrets.BASIS_SCHUTZ_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "Secret BASIS_SCHUTZ_TOKEN fehlt – Abgleich übersprungen." >> "$GITHUB_STEP_SUMMARY"
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v4
+
+      - name: basis-schutz-os holen
+        if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.UPSTREAM_REPO }}
+          ref: ${{ env.UPSTREAM_REF }}
+          path: .upstream/basis-schutz-os
+          token: ${{ secrets.BASIS_SCHUTZ_TOKEN }}
+
+      - name: Übernehmen und committen
+        if: steps.token.outputs.present == 'true'
+        run: |
+          set -euo pipefail
+          sha="$(git -C .upstream/basis-schutz-os rev-parse HEAD)"
+          current="$(sed -n 's/^commit=//p' deploy/basis-schutz-os.version 2>/dev/null || true)"
+
+          rsync -a --delete --exclude .git .upstream/basis-schutz-os/ deploy/basis-schutz-os/
+          rm -rf .upstream
+
+          if [ "$sha" = "$current" ] && [ -z "$(git status --porcelain -- deploy/basis-schutz-os)" ]; then
+            echo "basis-schutz-os ist aktuell (${sha:0:7})."
+            exit 0
+          fi
+
+          printf 'repository=%s\nbranch=%s\ncommit=%s\nsynced=%s\n' \
+            "$UPSTREAM_REPO" "$UPSTREAM_REF" "$sha" "$(date -u +%FT%TZ)" > deploy/basis-schutz-os.version
+
+          git add -A deploy/basis-schutz-os deploy/basis-schutz-os.version
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -q -m "basis-schutz-os auf ${sha:0:7} aktualisiert"
+          git push
+          echo "basis-schutz-os auf ${sha:0:7} aktualisiert." >> "$GITHUB_STEP_SUMMARY"

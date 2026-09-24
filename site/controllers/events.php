@@ -7,10 +7,13 @@ return function ($page, $kirby) {
 	$request = $kirby->request();
 	$now     = time();
 
-	$category     = (string)$request->get('art', '');
-	$availability = (string)$request->get('verfuegbarkeit', '');
-	$period       = $request->get('zeitraum') === 'vergangen' ? 'vergangen' : '';
-	$hasMonth     = $request->get('monat') !== null || $request->get('jahr') !== null;
+	// Nur einfache Zeichenketten akzeptieren (keine Arrays aus ?x[]=…)
+	$param = fn (string $key): string => is_string($value = $request->get($key)) ? $value : '';
+
+	$category     = $param('art');
+	$availability = $param('verfuegbarkeit');
+	$period       = $param('zeitraum') === 'vergangen' ? 'vergangen' : '';
+	$hasMonth     = $param('monat') !== '' || $param('jahr') !== '';
 
 	if (isset(EventStatus::CATEGORIES[$category]) === false) {
 		$category = '';
@@ -20,7 +23,7 @@ return function ($page, $kirby) {
 		$availability = '';
 	}
 
-	[$year, $month] = Calendar::normalizeMonth($request->get('jahr'), $request->get('monat'), $now);
+	[$year, $month] = Calendar::normalizeMonth($param('jahr'), $param('monat'), $now);
 	[$from, $to]    = Calendar::monthRange($year, $month);
 
 	$filters = [

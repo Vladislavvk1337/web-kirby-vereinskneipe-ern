@@ -12,9 +12,10 @@ return function ($kirby, $page) {
 
 	if ($kirby->request()->is('POST') === true) {
 		$request = $kirby->request();
+		$csrf    = $request->body()->get('csrf');
 		$result  = $form->handle(
 			$request->body()->toArray(),
-			$request->body()->get('csrf'),
+			is_string($csrf) ? $csrf : null,
 			$request->header('Origin'),
 			$kirby->visitor()->ip() ?? '0.0.0.0'
 		);
@@ -36,7 +37,8 @@ return function ($kirby, $page) {
 		$kirby->response()->code($result['status'] === 'ratelimit' ? 429 : 422);
 	} else {
 		// Vorauswahl aus einem Link „Diesen Termin anfragen“
-		$wanted = (string)$kirby->request()->get('termin', '');
+		$wanted = $kirby->request()->get('termin');
+		$wanted = is_string($wanted) ? $wanted : '';
 
 		if (isset($slots[$wanted]) === true) {
 			$values['slot'] = $wanted;

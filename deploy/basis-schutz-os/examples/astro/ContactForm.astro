@@ -1,0 +1,61 @@
+---
+// Kontaktformular für die statische Astro-Seite.
+// Sendet an /api/contact.php (PHP-FPM auf demselben Server).
+// Funktioniert auch ohne JavaScript (klassischer POST + Weiterleitung auf /danke/).
+---
+
+<form id="contact-form" action="/api/contact.php" method="post" novalidate>
+  <label>
+    Name
+    <input name="name" required maxlength="100" autocomplete="name" />
+  </label>
+  <label>
+    E-Mail
+    <input name="email" type="email" required maxlength="254" autocomplete="email" />
+  </label>
+  <label>
+    Nachricht
+    <textarea name="message" required minlength="10" maxlength="5000" rows="6"></textarea>
+  </label>
+
+  <!-- Honeypot: für Menschen unsichtbar, Bots füllen es aus -->
+  <div aria-hidden="true" style="position:absolute;left:-10000px">
+    <label>Website <input name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <button type="submit">Senden</button>
+  <p id="contact-status" role="status"></p>
+</form>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const status = document.getElementById('contact-status')!;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    status.textContent = 'Wird gesendet …';
+
+    const data = Object.fromEntries(new FormData(form));
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const body = await res.json().catch(() => ({}));
+
+      if (res.ok && body.ok) {
+        form.reset();
+        status.textContent = 'Danke! Deine Nachricht wurde gesendet.';
+      } else if (res.status === 429) {
+        status.textContent = 'Zu viele Anfragen – bitte in einer Minute erneut versuchen.';
+      } else if (body.errors) {
+        status.textContent = Object.values(body.errors).join(' ');
+      } else {
+        status.textContent = body.error ?? 'Senden fehlgeschlagen.';
+      }
+    } catch {
+      status.textContent = 'Netzwerkfehler – bitte später erneut versuchen.';
+    }
+  });
+</script>

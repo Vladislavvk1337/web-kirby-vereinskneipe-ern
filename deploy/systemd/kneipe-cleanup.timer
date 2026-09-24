@@ -1,0 +1,11 @@
+# Installiert von deploy/server-setup.sh nach /etc/systemd/system/
+[Unit]
+Description=Löschfrist für Terminanfragen täglich anwenden
+
+[Timer]
+OnCalendar=*-*-* 03:15
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

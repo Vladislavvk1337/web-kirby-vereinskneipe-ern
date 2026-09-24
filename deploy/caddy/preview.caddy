@@ -1,0 +1,8 @@
+# --------------------------------------------------------------------------
+# Phase „preview“ (SITE_PHASE="preview" in deploy/site.env)
+# Vorschau unter PREVIEW_HOST – Suchmaschinen sollen sie nicht aufnehmen.
+# --------------------------------------------------------------------------
+{{PREVIEW_HOST}} {
+	import site preview
+	header X-Robots-Tag "noindex, nofollow"
+}

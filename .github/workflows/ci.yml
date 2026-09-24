@@ -1,0 +1,57 @@
+name: Prüfung
+
+# Prüft jeden Push und Pull Request: PHP-Syntax, Unit-, Integrations- und
+# HTTP-Tests, Shell-Skripte und das Caddyfile. So fällt ein Fehler auf,
+# bevor der Server ihn beim nächsten Update-Lauf bemerkt.
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, intl, mbstring, curl, dom, zip
+          tools: composer
+          coverage: none
+
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: composer lint
+      - run: composer test
+
+  scripts:
+    name: Deploy-Skripte und Caddyfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bash-Syntax und ShellCheck
+        run: |
+          for f in deploy/*.sh; do bash -n "$f"; done
+          shellcheck -x -S warning deploy/*.sh
+
+      - name: Caddyfile prüfen
+        run: |
+          curl -fsSL "https://github.com/caddyserver/caddy/releases/download/v2.10.2/caddy_2.10.2_linux_amd64.tar.gz" | tar xz caddy
+          sed -e 's#{{ACME_EMAIL}}#ci@example.org#; s#{{APP_DIR}}#/tmp/app#g; s#{{DATA_DIR}}#/tmp/data#g; s#{{KIRBY_SOCKET}}#/tmp/php.sock#g' deploy/caddy/Caddyfile > Caddyfile.ci
+          for phase in preview live; do
+            cp Caddyfile.ci "Caddyfile.$phase"
+            if [ "$phase" = preview ]; then cat deploy/caddy/preview.caddy; else cat deploy/caddy/live.caddy deploy/caddy/preview-redirect.caddy; fi \
+              | sed -e 's#{{PREVIEW_HOST}}#labs.example.org#; s#{{LIVE_HOST}}#www.example.org#g; s#{{DOMAIN}}#example.org#' >> "Caddyfile.$phase"
+            ./caddy validate --config "Caddyfile.$phase" --adapter caddyfile
+          done

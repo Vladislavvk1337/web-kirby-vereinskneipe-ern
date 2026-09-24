@@ -104,7 +104,7 @@ final class Richtext
 
 			$attributes = ' href="' . htmlspecialchars($href, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '"';
 
-			if (preg_match('!^https?://!i', $href) === 1) {
+			if (preg_match('~^https?://~i', $href) === 1) {
 				$attributes .= ' rel="noopener"';
 			}
 		}
@@ -121,11 +121,11 @@ final class Richtext
 		}
 
 		// relative Adressen und Anker
-		if (preg_match('!^(/(?!/)|#)!', $href) === 1) {
+		if (preg_match('~^(/(?!/)|#)~', $href) === 1) {
 			return $href;
 		}
 
-		if (preg_match('!^(https?://|mailto:|tel:)!i', $href) === 1) {
+		if (preg_match('~^(https?://|mailto:|tel:)~i', $href) === 1) {
 			return $href;
 		}
 
