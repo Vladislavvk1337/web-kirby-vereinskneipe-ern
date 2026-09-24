@@ -38,7 +38,10 @@ WORKDIR /build
 ENV COMPOSER_ALLOW_SUPERUSER=1 COMPOSER_NO_INTERACTION=1
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-progress --prefer-dist --optimize-autoloader --no-scripts
+# PHP-Erweiterungen (gd, intl …) gibt es erst in der Laufzeitstufe; dort
+# prüft der Build sie ausdrücklich
+RUN composer install --no-dev --no-progress --prefer-dist --optimize-autoloader --no-scripts \
+      --ignore-platform-req='ext-*'
 
 # --------------------------------------------------------------------------
 # Laufzeit
@@ -68,7 +71,9 @@ RUN set -eux; \
       | sort -u | xargs -r dpkg-query --search | cut -d: -f1 | sort -u | xargs -r apt-mark manual > /dev/null; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*; \
-    php -m | grep -qi '^gd$'; php -m | grep -qi '^intl$'
+    for ext in gd intl zip exif ctype curl dom filter hash iconv json libxml mbstring openssl SimpleXML fileinfo; do \
+      php -m | grep -qix "$ext" || { echo "PHP-Erweiterung fehlt: $ext" >&2; exit 1; }; \
+    done
 
 # Apache: Module, eigener Site-Block, Port 8080, keine Standardseite
 RUN set -eux; \
