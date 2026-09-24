@@ -151,7 +151,7 @@ Person ein eigenes – legt die Administration im Panel unter **Accounts** an.
 | `KIRBY_CONTENT_ROOT` | `/data/content` | Inhalte (Seiten, Bilder, Anfragen) |
 | `KIRBY_MEDIA_ROOT` | `/data/media` | Von Kirby erzeugte Bildgrößen; Apache liefert `/media` aus diesem Ordner aus – deshalb nicht ändern |
 | `KIRBY_STORAGE_ROOT` | `/data/storage` | Konten, Sitzungen, Cache, Protokolle, Lizenz |
-| `KIRBY_ENV_FILE` | `/dev/null` | Optionale `.env`-Datei (z. B. als Secret-Datei eingehängt). Umgebungsvariablen haben Vorrang |
+| `KIRBY_ENV_FILE` | leer (= `/var/www/html/.env`) | Optionale `.env`-Datei statt einzelner Variablen, z. B. ein Secret per `subPath` nach `/var/www/html/.env` eingehängt. Muss innerhalb von `KNEIPE_OPEN_BASEDIR` liegen. Umgebungsvariablen haben Vorrang |
 | `KNEIPE_OPEN_BASEDIR` | `/var/www/html/:/data/:/tmp/` | PHP darf nur diese Pfade lesen. Bei geänderten Pfaden anpassen |
 
 ### PHP und Apache

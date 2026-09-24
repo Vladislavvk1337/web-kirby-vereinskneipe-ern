@@ -56,7 +56,7 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://localhost:8080/readyz && break; sleep 1; done
 
           check() {
-            code="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$1")"
+            code="$(curl -sL --max-redirs 5 -o /dev/null -w '%{http_code}' "http://localhost:8080$1")"
             echo "$1 → $code (erwartet $2)"
             [ "$code" = "$2" ] || { docker logs kneipe; exit 1; }
           }
@@ -96,6 +96,8 @@ jobs:
           docker exec kneipe php -m | grep -qi '^intl$'
           docker exec kneipe php -m | grep -qi '^gd$'
           docker logs kneipe 2>&1 | grep -q 'Erster Administrator angelegt'
+          # keine PHP-Warnungen oder -Fehler im Protokoll
+          ! docker logs kneipe 2>&1 | grep -E 'PHP (Warning|Fatal|Parse|Notice|Deprecated)'
 
           # Wartung als eigener Aufruf (z. B. Kubernetes-CronJob)
           docker run --rm -v kneipe-data:/data \
