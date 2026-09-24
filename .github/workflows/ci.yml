@@ -48,7 +48,7 @@ jobs:
       - name: Caddyfile prüfen
         run: |
           curl -fsSL "https://github.com/caddyserver/caddy/releases/download/v2.10.2/caddy_2.10.2_linux_amd64.tar.gz" | tar xz caddy
-          sed -e 's#{{ACME_EMAIL}}#ci@example.org#; s#{{APP_DIR}}#/tmp/app#g; s#{{DATA_DIR}}#/tmp/data#g; s#{{KIRBY_SOCKET}}#/tmp/php.sock#g' deploy/caddy/Caddyfile > Caddyfile.ci
+          sed -e 's#{{ACME_EMAIL}}#ci@example.org#; s#{{APP_DIR}}#/tmp/app#g; s#{{DATA_DIR}}#/tmp/data#g; s#{{KIRBY_SOCKET}}#/tmp/php.sock#g; s#/var/log/caddy/#/tmp/#g' deploy/caddy/Caddyfile > Caddyfile.ci
           for phase in preview live; do
             cp Caddyfile.ci "Caddyfile.$phase"
             if [ "$phase" = preview ]; then cat deploy/caddy/preview.caddy; else cat deploy/caddy/live.caddy deploy/caddy/preview-redirect.caddy; fi \
