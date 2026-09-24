@@ -64,17 +64,20 @@ final class RequestForm
 			return ['status' => 'spam', 'values' => [], 'errors' => []];
 		}
 
+		$result = RequestValidator::validate($input, $this->slots(), date('Y-m-d'));
+
+		// Unvollständige Eingaben immer mit Fehlermeldungen beantworten –
+		// auch wenn sehr schnell abgeschickt wurde
+		if ($result['errors'] !== []) {
+			return ['status' => 'invalid', 'values' => $result['values'], 'errors' => $result['errors']];
+		}
+
+		// Zeitfalle: vollständig ausgefüllt schneller als ein Mensch tippen kann
 		$elapsed = FormTimer::elapsed((string)($input[self::TIMER] ?? ''), kneipe()->secret());
 		$min     = (int)$this->kirby->option('kneipe.requests.minSeconds', 3);
 
 		if ($elapsed === null || $elapsed < $min) {
 			return ['status' => 'spam', 'values' => [], 'errors' => []];
-		}
-
-		$result = RequestValidator::validate($input, $this->slots(), date('Y-m-d'));
-
-		if ($result['errors'] !== []) {
-			return ['status' => 'invalid', 'values' => $result['values'], 'errors' => $result['errors']];
 		}
 
 		// Gezählt werden nur vollständige Anfragen – Tippfehler sperren niemanden aus

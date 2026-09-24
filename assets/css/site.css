@@ -1247,7 +1247,14 @@ mark.placeholder {
     align-items: start;
   }
 
+  .event-detail__main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
   .event-detail__facts {
+    grid-column: 2;
+    grid-row: 1;
     position: sticky;
     top: var(--ui-space-s);
   }

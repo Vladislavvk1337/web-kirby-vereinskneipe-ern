@@ -21,6 +21,40 @@ $private = $page->isPrivateEvent();
   <?php endsnippet() ?>
 
   <div class="container event-detail__grid">
+    <?php // Fakten zuerst: auf dem Handy stehen Datum und Uhrzeit oben ?>
+    <aside class="event-detail__facts" aria-labelledby="fakten-titel">
+      <h2 id="fakten-titel" class="visually-hidden">Das Wichtigste auf einen Blick</h2>
+      <dl class="fact-list">
+        <?php if ($start): ?>
+        <div><dt><?php snippet('icon', ['name' => 'calendar']) ?>Datum</dt><dd><time datetime="<?= date($page->isAllDay() ? 'Y-m-d' : 'c', $start) ?>"><?= $kneipe->formatDate($start) ?></time></dd></div>
+        <div><dt><?php snippet('icon', ['name' => 'clock']) ?>Uhrzeit</dt><dd><?= esc($kneipe->timeRange($page)) ?></dd></div>
+        <?php endif ?>
+        <?php if ($doors = $page->doorsTimestamp()): ?>
+        <div><dt><?php snippet('icon', ['name' => 'door']) ?>Einlass</dt><dd><?= date('H:i', $doors) ?> Uhr</dd></div>
+        <?php endif ?>
+        <div><dt><?php snippet('icon', ['name' => 'pin']) ?>Ort</dt><dd>
+          <?php if ($page->locationName() !== ''): ?><?= esc($page->locationName()) ?><br><?php endif ?>
+          <?= $page->locationAddress() !== '' ? kneipe_text($page->locationAddress()) : '<mark class="placeholder">[Adresse folgt]</mark>' ?>
+          <?php if ($map = $kneipe->mapUrl()): ?><br><a class="link-external" href="<?= esc($map) ?>" rel="noopener">Karte<?php snippet('icon', ['name' => 'external']) ?><span class="visually-hidden"> (OpenStreetMap, externe Website)</span></a><?php endif ?>
+        </dd></div>
+        <?php if ($team): ?>
+        <div><dt><?php snippet('icon', ['name' => 'users']) ?>Thekenteam</dt><dd><a href="<?= $team->url() ?>"><?= esc($team->title()) ?></a></dd></div>
+        <?php endif ?>
+        <?php if (!$private && $page->audience()->isNotEmpty()): ?>
+        <div><dt><?php snippet('icon', ['name' => 'users']) ?>Für wen?</dt><dd><?= $page->audience()->toSafeText() ?></dd></div>
+        <?php endif ?>
+        <?php if (!$private && $page->admission()->isNotEmpty()): ?>
+        <div><dt><?php snippet('icon', ['name' => 'ticket']) ?>Eintritt</dt><dd><?= $page->admission()->toSafeText() ?></dd></div>
+        <?php endif ?>
+        <?php if (!$private && $page->publiccontact()->isNotEmpty()): ?>
+        <div><dt><?php snippet('icon', ['name' => 'mail']) ?>Kontakt</dt><dd><?= $page->publiccontact()->toSafeText() ?></dd></div>
+        <?php endif ?>
+      </dl>
+      <?php if ($page->hasIcs() && !$page->isPast()): ?>
+      <p><a class="button button--secondary button--block" href="<?= $page->url() ?>.ics" download><?php snippet('icon', ['name' => 'download']) ?>In den eigenen Kalender eintragen</a></p>
+      <?php endif ?>
+    </aside>
+
     <div class="event-detail__main">
       <?php if ($page->isCancelled()): ?>
       <div class="notice notice--danger" role="note"><?php snippet('icon', ['name' => 'cancel']) ?><p><strong>Diese Veranstaltung ist abgesagt.</strong> Bitte kommt an diesem Termin nicht vorbei.</p></div>
@@ -65,38 +99,6 @@ $private = $page->isPrivateEvent();
       <?php endif ?>
     </div>
 
-    <aside class="event-detail__facts" aria-labelledby="fakten-titel">
-      <h2 id="fakten-titel" class="visually-hidden">Das Wichtigste auf einen Blick</h2>
-      <dl class="fact-list">
-        <?php if ($start): ?>
-        <div><dt><?php snippet('icon', ['name' => 'calendar']) ?>Datum</dt><dd><time datetime="<?= date($page->isAllDay() ? 'Y-m-d' : 'c', $start) ?>"><?= $kneipe->formatDate($start) ?></time></dd></div>
-        <div><dt><?php snippet('icon', ['name' => 'clock']) ?>Uhrzeit</dt><dd><?= esc($kneipe->timeRange($page)) ?></dd></div>
-        <?php endif ?>
-        <?php if ($doors = $page->doorsTimestamp()): ?>
-        <div><dt><?php snippet('icon', ['name' => 'door']) ?>Einlass</dt><dd><?= date('H:i', $doors) ?> Uhr</dd></div>
-        <?php endif ?>
-        <div><dt><?php snippet('icon', ['name' => 'pin']) ?>Ort</dt><dd>
-          <?php if ($page->locationName() !== ''): ?><?= esc($page->locationName()) ?><br><?php endif ?>
-          <?= $page->locationAddress() !== '' ? kneipe_text($page->locationAddress()) : '<mark class="placeholder">[Adresse folgt]</mark>' ?>
-          <?php if ($map = $kneipe->mapUrl()): ?><br><a class="link-external" href="<?= esc($map) ?>" rel="noopener">Karte<?php snippet('icon', ['name' => 'external']) ?><span class="visually-hidden"> (OpenStreetMap, externe Website)</span></a><?php endif ?>
-        </dd></div>
-        <?php if ($team): ?>
-        <div><dt><?php snippet('icon', ['name' => 'users']) ?>Thekenteam</dt><dd><a href="<?= $team->url() ?>"><?= esc($team->title()) ?></a></dd></div>
-        <?php endif ?>
-        <?php if (!$private && $page->audience()->isNotEmpty()): ?>
-        <div><dt><?php snippet('icon', ['name' => 'users']) ?>Für wen?</dt><dd><?= $page->audience()->toSafeText() ?></dd></div>
-        <?php endif ?>
-        <?php if (!$private && $page->admission()->isNotEmpty()): ?>
-        <div><dt><?php snippet('icon', ['name' => 'ticket']) ?>Eintritt</dt><dd><?= $page->admission()->toSafeText() ?></dd></div>
-        <?php endif ?>
-        <?php if (!$private && $page->publiccontact()->isNotEmpty()): ?>
-        <div><dt><?php snippet('icon', ['name' => 'mail']) ?>Kontakt</dt><dd><?= $page->publiccontact()->toSafeText() ?></dd></div>
-        <?php endif ?>
-      </dl>
-      <?php if ($page->hasIcs() && !$page->isPast()): ?>
-      <p><a class="button button--secondary button--block" href="<?= $page->url() ?>.ics" download><?php snippet('icon', ['name' => 'download']) ?>In den eigenen Kalender eintragen</a></p>
-      <?php endif ?>
-    </aside>
   </div>
 </article>
 <?php snippet('footer') ?>

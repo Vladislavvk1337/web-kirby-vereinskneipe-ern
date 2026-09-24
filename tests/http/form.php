@@ -60,6 +60,12 @@ test('manipulierte Zeitfalle wird als Bot gewertet', function () use ($valid) {
 	$response = $http->post('/termin-anfragen', [...$valid(), ...$hidden, 'formstart' => '1.abc']);
 	assert_same(303, $response['status']);
 	assert_same($before, count(request_drafts()));
+
+	// Unvollständig und zu schnell: Menschen bekommen trotzdem Fehlermeldungen
+	$hidden = hidden_fields($http->get('/termin-anfragen')['body']);
+	$response = $http->post('/termin-anfragen', [...$hidden, 'formstart' => '1.abc', 'groupname' => 'Schnell']);
+	assert_same(422, $response['status']);
+	assert_contains('id="fehleruebersicht"', $response['body']);
 });
 
 test('Validierungsfehler stehen am Feld, Eingaben bleiben erhalten', function () use ($valid) {
