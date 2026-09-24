@@ -1,0 +1,128 @@
+name: Container-Image
+
+# Baut das Image bei jedem Push und Pull Request, startet es mit einem
+# Volume und prüft Seiten, Sperren, Header und Health-Checks. Auf main wird
+# das geprüfte Image nach ghcr.io veröffentlicht (Tags: latest, sha-<kurz>).
+# Dokumentation: Docker.md
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  image:
+    name: Bauen, prüfen, veröffentlichen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Image-Namen (Kleinbuchstaben)
+        run: echo "IMAGE=${IMAGE,,}" >> "$GITHUB_ENV"
+
+      - name: Bauen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: kneipe-web:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-Test
+        run: |
+          set -euo pipefail
+          docker volume create kneipe-data
+          docker run -d --name kneipe --read-only --tmpfs /tmp:uid=33,gid=33 \
+            -v kneipe-data:/data -p 8080:8080 \
+            -e KIRBY_URL=http://localhost:8080 \
+            -e KIRBY_CONTENT_SALT="$(openssl rand -hex 32)" \
+            -e KIRBY_COOKIE_KEY="$(openssl rand -hex 32)" \
+            -e KIRBY_MAIL_TRANSPORT=none \
+            -e KNEIPE_ADMIN_EMAIL=admin@example.org \
+            -e KNEIPE_ADMIN_PASSWORD=ci-test-passwort-123 \
+            kneipe-web:test
+
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/readyz && break; sleep 1; done
+
+          check() {
+            code="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$1")"
+            echo "$1 → $code (erwartet $2)"
+            [ "$code" = "$2" ] || { docker logs kneipe; exit 1; }
+          }
+
+          check /healthz 200
+          check /readyz 200
+          check / 200
+          check /termine 200
+          check '/termine?jahr=2026&monat=10' 200
+          check /termine/kneipenabend-mit-dem-beispiel-thekenteam 200
+          check /termine.ics 200
+          check /termin-anfragen 200
+          check /thekenteams 200
+          check /kontakt 200
+          check /panel/login 200
+          check /sitemap.xml 200
+          check /gibt-es-nicht 404
+          check /anfragen 404
+          check /content/site.txt 404
+          check /.env 404
+
+          for path in /site/config/config.php /kirby/bootstrap.php /vendor/autoload.php; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$path")"
+            echo "$path → $code (gesperrt)"
+            case "$code" in 403|404) ;; *) exit 1 ;; esac
+          done
+
+          curl -sI http://localhost:8080/ | grep -qi '^content-security-policy: default-src' 
+          curl -sI http://localhost:8080/panel/login | grep -qi "unsafe-inline"
+          curl -s http://localhost:8080/ | grep -q 'Nächster Öffnungstermin'
+
+          # Vorschaubild wird von Kirby erzeugt und aus /data/media ausgeliefert
+          img="$(curl -s http://localhost:8080/ | grep -o 'http://localhost:8080/media/[^" ]*\.webp' | head -1)"
+          [ -n "$img" ] && curl -fsS -o /dev/null "$img"
+
+          [ "$(docker exec kneipe id -u)" = "33" ]
+          docker exec kneipe php -m | grep -qi '^intl$'
+          docker exec kneipe php -m | grep -qi '^gd$'
+          docker logs kneipe 2>&1 | grep -q 'Erster Administrator angelegt'
+
+          # Wartung als eigener Aufruf (z. B. Kubernetes-CronJob)
+          docker run --rm -v kneipe-data:/data \
+            -e KIRBY_URL=http://localhost:8080 \
+            -e KIRBY_CONTENT_SALT="$(openssl rand -hex 32)" -e KIRBY_COOKIE_KEY="$(openssl rand -hex 32)" \
+            kneipe-web:test php bin/cleanup-requests.php
+
+          # Ohne Geheimnisse darf das Image nicht starten
+          ! docker run --rm kneipe-web:test
+
+      - name: Anmelden bei ghcr.io
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Veröffentlichen
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}

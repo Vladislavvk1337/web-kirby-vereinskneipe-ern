@@ -8,8 +8,55 @@
 use Kirby\Cms\App;
 use Kirby\Cms\Page;
 use Kirby\Cms\Response;
+use Kneipe\RateLimiter;
+use Kneipe\Retention;
+
+/** Antwort für Health-Checks: nie zwischenspeichern, keine Details */
+$health = function (bool $ok): Response {
+	return new Response([
+		'body'    => $ok ? "ok\n" : "nicht bereit\n",
+		'type'    => 'text/plain',
+		'code'    => $ok ? 200 : 503,
+		'headers' => ['Cache-Control' => 'no-store', 'X-Robots-Tag' => 'noindex'],
+	]);
+};
 
 return [
+	[
+		// Liveness: PHP und Kirby antworten
+		'pattern' => 'healthz',
+		'action'  => fn () => $health(true),
+	],
+	[
+		// Readiness: Inhalte lesbar, Laufzeitdaten beschreibbar.
+		// Nebenbei höchstens einmal täglich die Löschfrist für Anfragen
+		// anwenden – im Container gibt es keinen systemd-Timer.
+		'pattern' => 'readyz',
+		'action'  => function () use ($health) {
+			$kirby = App::instance();
+			// vorhandene Ordner beschreibbar – oder anlegbar
+			$writable = fn (string $dir): bool => is_dir($dir) ? is_writable($dir) : is_writable(dirname($dir));
+			$ready    = is_file($kirby->root('content') . '/site.txt')
+				&& $writable($kirby->root('sessions'))
+				&& $writable($kirby->root('cache'))
+				&& $writable($kirby->root('media'));
+
+			$marker = $kirby->root('cache') . '/kneipe-maintenance';
+
+			if ($ready === true && (is_file($marker) === false || filemtime($marker) < time() - 86400)) {
+				@touch($marker);
+
+				try {
+					Retention::cleanup($kirby, kneipe()->retentionDays());
+					(new RateLimiter($kirby->root('cache') . '/kneipe-ratelimit', kneipe()->secret()))->prune();
+				} catch (Throwable $e) {
+					error_log('[kneipe] Tägliche Wartung fehlgeschlagen: ' . $e::class);
+				}
+			}
+
+			return $health($ready);
+		},
+	],
 	[
 		// Anfragen enthalten personenbezogene Daten und haben keine
 		// öffentliche Ansicht – auch nicht für angemeldete Personen

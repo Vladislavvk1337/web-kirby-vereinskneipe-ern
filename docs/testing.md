@@ -57,7 +57,7 @@ Geprüft lokal mit PHP 8.4, Kirby 5.6.0, Chromium (Playwright 1.56).
 
 | Prüfung | Ergebnis |
 | --- | --- |
-| `composer test` | 74 Tests bestanden |
+| `composer test` | 76 Tests bestanden |
 | Horizontaler Überlauf 375–1920 px | keiner (18 Seiten × 6 Breiten) |
 | Konsolenfehler | keine |
 | Startseite, Übertragung | 9 Anfragen, ca. 170 KB unkomprimiert, 1,2 KB JavaScript |

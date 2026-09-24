@@ -7,6 +7,9 @@ automatischem TLS, aktualisiert von einem **systemd-Timer** alle 5 Minuten.
 Unterschied zur Astro-Vorlage: Kirby läuft dynamisch über **PHP-FPM**, und
 Inhalte, die im Panel gepflegt werden, liegen außerhalb des Programmcodes.
 
+> Betrieb in **Kubernetes oder Docker** statt auf einem eigenen Server:
+> siehe [Docker.md](../Docker.md).
+
 > **HTTPS ist Voraussetzung.** Panel-Anmeldung und Formular nur über HTTPS
 > betreiben – Caddy leitet HTTP automatisch um und holt die Zertifikate.
 

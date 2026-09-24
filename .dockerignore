@@ -1,0 +1,25 @@
+# Nur, was das Image braucht – Kirby und vendor/ installiert der Build selbst
+.git
+.github
+.env
+.env.*
+!.env.example
+kirby/
+vendor/
+media/*
+site/accounts/
+site/sessions/
+site/cache/
+site/logs/
+site/config/.license
+content/anfragen/_drafts/
+content/**/_changes/
+node_modules/
+tests/
+tools/
+deploy/
+docs/
+*.md
+Dockerfile
+.dockerignore
+.DS_Store

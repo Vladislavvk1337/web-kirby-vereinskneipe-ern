@@ -42,8 +42,8 @@ jobs:
 
       - name: Bash-Syntax und ShellCheck
         run: |
-          for f in deploy/*.sh; do bash -n "$f"; done
-          shellcheck -x -S warning deploy/*.sh
+          for f in deploy/*.sh docker/*.sh; do bash -n "$f"; done
+          shellcheck -x -S warning deploy/*.sh docker/*.sh
 
       - name: Caddyfile prüfen
         run: |

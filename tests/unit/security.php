@@ -59,3 +59,28 @@ test('keine externen Schriften, Skripte oder Tracker in Templates und CSS', func
 		}
 	}
 });
+
+test('Container: nicht als root, Daten im Volume, Sperren und CSP wie auf dem Server', function () use ($root) {
+	$dockerfile = file_get_contents($root . '/Dockerfile');
+	assert_contains('USER www-data', $dockerfile);
+	assert_contains('VOLUME ["/data"]', $dockerfile);
+	assert_contains('KIRBY_CONTENT_ROOT=/data/content', $dockerfile);
+	assert_contains('KIRBY_DEBUG=false', $dockerfile);
+	$code = implode("\n", array_filter(explode("\n", $dockerfile), fn ($line) => str_starts_with(ltrim($line), '#') === false));
+	foreach (['KIRBY_CONTENT_SALT=', 'KIRBY_COOKIE_KEY=', 'KIRBY_SMTP_PASSWORD=', 'KNEIPE_ADMIN_PASSWORD='] as $secret) {
+		assert_not_contains($secret, $code, 'keine Geheimnisse im Image');
+	}
+
+	$apache = file_get_contents($root . '/docker/apache-kneipe.conf');
+	foreach (['(content|site|kirby|vendor', '(^|/)\\.(?!well-known/)', 'AllowOverride None', 'RemoteIPHeader X-Forwarded-For', "script-src 'self';", 'disable_functions'] as $needle) {
+		assert_contains($needle, $apache, 'apache-kneipe.conf');
+	}
+
+	$entrypoint = file_get_contents($root . '/docker/docker-entrypoint.sh');
+	assert_contains('KIRBY_CONTENT_SALT KIRBY_COOKIE_KEY', $entrypoint, 'Start ohne Geheimnisse verhindern');
+
+	$ignore = file_get_contents($root . '/.dockerignore');
+	foreach (['.env', 'site/accounts/', 'content/anfragen/_drafts/', '.git'] as $entry) {
+		assert_contains($entry, $ignore, '.dockerignore');
+	}
+});

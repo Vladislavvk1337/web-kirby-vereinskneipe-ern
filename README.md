@@ -151,7 +151,7 @@ ins Protokoll kommt nur die technische Ursache, keine Formulardaten.
 ## Tests
 
 ```bash
-composer test          # 74 Tests: Unit, Integration (Kirby), HTTP (PHP-Server)
+composer test          # 76 Tests: Unit, Integration (Kirby), HTTP (PHP-Server)
 ```
 
 Zusätzlich Browser-Prüfungen mit Playwright (Breiten 375–1920 px,
@@ -175,6 +175,11 @@ und werden bei Deployments nie überschrieben.
 sudo /srv/kneipe/repo/deploy/server-setup.sh
 sudo kneipe-cli create-user --email=… --name="…" --role=admin
 ```
+
+**Alternativ als Container** (Kubernetes/Docker): [`Dockerfile`](Dockerfile),
+Image `ghcr.io/vladislavvk1337/web-kirby-vereinskneipe-ern`, Konfiguration
+nur über Umgebungsvariablen, Daten im Volume `/data` – siehe
+**[Docker.md](Docker.md)**.
 
 Anleitung: [docs/deployment.md](docs/deployment.md) · Sicherung:
 [docs/backup-restore.md](docs/backup-restore.md) · Sicherheit:
@@ -237,6 +242,7 @@ Liste aller fehlenden Angaben: [docs/project-data-needed.md](docs/project-data-n
 | [docs/architecture.md](docs/architecture.md) | Aufbau, Status-Logik, Workflow, Datenschutzabwägung |
 | [docs/content-model.md](docs/content-model.md) | alle Seitentypen und Felder |
 | [docs/editor-guide.md](docs/editor-guide.md) | Redaktionsleitfaden |
+| [Docker.md](Docker.md) | Container-Image, Umgebungsvariablen, Volumes, Kubernetes |
 | [docs/deployment.md](docs/deployment.md) | Server einrichten und betreiben |
 | [docs/backup-restore.md](docs/backup-restore.md) | Sicherung und Wiederherstellung |
 | [docs/security.md](docs/security.md) | Sicherheitsmaßnahmen, Header, CSP |

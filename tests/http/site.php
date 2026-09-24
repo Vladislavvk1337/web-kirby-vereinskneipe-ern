@@ -108,3 +108,15 @@ test('Kalender: ungültige Parameter führen nicht zu Fehlern', function () {
 	assert_contains('Termin frei', $filtered['body']);
 	assert_contains('noindex', $filtered['body'], 'gefilterte Ansicht nicht indexieren');
 });
+
+test('Health-Checks für Kubernetes', function () {
+	$http = new HttpClient();
+
+	foreach (['/healthz', '/readyz'] as $path) {
+		$response = $http->get($path);
+		assert_same(200, $response['status'], $path);
+		assert_same("ok\n", $response['body'], $path);
+		assert_contains('no-store', implode(' ', $response['headers']['cache-control'] ?? []), $path);
+		assert_same([], $response['headers']['set-cookie'] ?? [], "$path setzt keine Cookies");
+	}
+});

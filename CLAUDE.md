@@ -23,6 +23,7 @@ Muster von [astro-web-basic-template](https://github.com/Vladislavvk1337/astro-w
   - Stammdaten, Einstellungen → Panel (`content/site.txt`)
   - Farben, Schriften, Abstände → `assets/css/tokens.css` (Präfix `--ui-`)
   - Server-Namen, Domain, Phase → `deploy/site.env`
+  - Container-Konfiguration → Umgebungsvariablen (`Dockerfile`, `Docker.md`)
   - Geheimnisse → Umgebung (`.env` lokal, `config/kirby.env` auf dem Server)
 - Feldnamen klein, ohne Bindestrich; wiederverwendbare Blueprint-Teile in
   `fields/`, `sections/`, `tabs/`, `options/`.
@@ -44,7 +45,7 @@ Muster von [astro-web-basic-template](https://github.com/Vladislavvk1337/astro-w
 ```bash
 composer lint
 composer test                          # Unit, Integration, HTTP
-shellcheck -x -S warning deploy/*.sh   # wenn deploy/ geändert wurde
+shellcheck -x -S warning deploy/*.sh docker/*.sh   # wenn deploy/ oder docker/ geändert wurde
 ```
 
 Bei Änderungen am Frontend zusätzlich die Browser-Prüfung (`docs/testing.md`):
