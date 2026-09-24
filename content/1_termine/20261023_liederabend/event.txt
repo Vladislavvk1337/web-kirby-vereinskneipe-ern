@@ -1,0 +1,109 @@
+Title: Demo-Veranstaltung: Liederabend
+
+----
+
+Location: 
+
+----
+
+Address: 
+
+----
+
+Allday: false
+
+----
+
+Audience: 
+
+----
+
+Admission: [Platzhalter: Eintrittsinformation]
+
+----
+
+Publiccontact: 
+
+----
+
+Internalnote: 
+
+----
+
+Responsible: 
+
+----
+
+Conflictaccepted: false
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00
+
+----
+
+Changelog: 
+
+----
+
+Text: 
+
+----
+
+Doors: 19:00:00
+
+----
+
+End: 2026-10-23 22:30:00
+
+----
+
+Cover: 
+
+----
+
+Gallery: 
+
+----
+
+Seotitle: 
+
+----
+
+Seodescription: 
+
+----
+
+Category: kultur
+
+----
+
+Orgstatus: veroeffentlicht
+
+----
+
+Start: 2026-10-23 19:30:00
+
+----
+
+Team: - page://df1cdbc68a46e154
+
+----
+
+Teaser: Beispiel für eine Kultur- oder Musikveranstaltung mit eigenem Einlass.
+
+----
+
+Uuid: 37fd535b76a2a7fe

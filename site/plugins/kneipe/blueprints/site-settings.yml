@@ -1,0 +1,44 @@
+# Einstellungen – nur Administration
+label: Einstellungen
+icon: settings
+columns:
+  - width: 1/2
+    fields:
+      workflowheadline:
+        type: headline
+        label: Freigabe
+      approvalmode:
+        label: Freigabemodus
+        type: toggle
+        default: true
+        text:
+          - Aus – Moderatoren veröffentlichen selbst
+          - An – nur die Administration bestätigt und veröffentlicht
+      requestsheadline:
+        type: headline
+        label: Terminanfragen
+      requestrecipient:
+        label: Empfänger der Terminanfragen
+        type: email
+        help: Leer = allgemeine E-Mail-Adresse aus den Stammdaten.
+      requestreceipt:
+        label: Eingangsbestätigung an die anfragende Person
+        type: toggle
+        default: true
+        text:
+          - Nicht senden
+          - Kurze Bestätigung senden (ohne Formularinhalte)
+      retentiondays:
+        label: Löschfrist für Anfragen (Tage)
+        type: number
+        min: 30
+        max: 730
+        default: 180
+        required: true
+        help: Anfragen werden danach automatisch endgültig gelöscht. Muss zur Datenschutzerklärung passen.
+  - width: 1/2
+    sections:
+      warnings:
+        type: info
+        headline: Einrichtung
+        text: "{{ site.dashboardWarnings }}"

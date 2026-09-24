@@ -1,0 +1,37 @@
+# Abhängigkeiten (composer install)
+/kirby/
+/vendor/
+
+# Laufzeitdaten – nie ins Repository
+/media/*
+!/media/index.html
+/site/accounts/*
+!/site/accounts/index.html
+/site/sessions/
+/site/cache/
+/site/logs/
+/site/config/.license
+/storage/
+
+# Personenbezogene Daten: Anfragen aus dem Formular
+/content/anfragen/_drafts/
+# Kirby-Änderungsstände (Panel-Entwürfe) und Sperrdateien
+/content/**/_changes/
+.lock
+
+# Geheimnisse
+.env
+.env.*
+!.env.example
+
+# Tests und Werkzeuge
+/tests/tmp/
+/tests/screenshots/
+node_modules/
+
+# System und Editoren
+.DS_Store
+Icon
+*.sublime-workspace
+/.vscode
+/.idea

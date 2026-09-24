@@ -1,0 +1,98 @@
+Title: Ehrenamtskneipe Erndtebrück
+
+----
+
+Claim: Von Erndtebrück. Für Erndtebrück. Zusammen.
+
+----
+
+Description: Eine Kneipe, die von vielen getragen wird: Vereine, Initiativen, Unternehmen und private Gruppen aus Erndtebrück und den Ortsteilen übernehmen abwechselnd ehrenamtlich die Theke.
+
+----
+
+Venue: 
+
+----
+
+Street: 
+
+----
+
+Postalcode: 
+
+----
+
+City: Erndtebrück
+
+----
+
+Latitude: 
+
+----
+
+Longitude: 
+
+----
+
+Email: kontakt@example.org
+
+----
+
+Phone: 
+
+----
+
+Openinghours:
+
+- 
+  days: '[Platzhalter: Wochentag]'
+  time: '[Platzhalter: Uhrzeit]'
+  note: Reguläre Öffnungszeiten werden noch festgelegt.
+
+----
+
+Openingnote: Geöffnet ist an allen Terminen, die im Kalender als bestätigt stehen.
+
+----
+
+Social: 
+
+----
+
+Operator: 
+
+----
+
+Legalrepresentative: 
+
+----
+
+Legalregister: 
+
+----
+
+Legalresponsible: 
+
+----
+
+Legalhoster: 
+
+----
+
+Legalmailprovider: 
+
+----
+
+Approvalmode: true
+
+----
+
+Requestrecipient: redaktion@example.org
+
+----
+
+Requestreceipt: true
+
+----
+
+Retentiondays: 180

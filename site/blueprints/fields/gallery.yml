@@ -1,0 +1,10 @@
+label: Bildergalerie
+type: files
+query: page.images
+uploads: image
+layout: cards
+size: small
+image:
+  cover: true
+  ratio: 1/1
+help: Nur Bilder verwenden, für die die Einwilligung der abgebildeten Personen vorliegt (beim Bild dokumentieren).

@@ -1,0 +1,46 @@
+title: Mitmachen
+icon: users
+extends: options/admin-only
+
+columns:
+  main:
+    width: 2/3
+    fields:
+      intro:
+        label: Einleitung
+        type: textarea
+        buttons: false
+      steps:
+        label: Ablauf für Gruppen
+        type: structure
+        fields:
+          title:
+            label: Schritt
+            type: text
+          text:
+            label: Erläuterung
+            type: textarea
+            buttons: false
+      helpers:
+        extends: fields/richtext
+        label: Text für einzelne Helferinnen und Helfer
+      faq:
+        label: Häufige Fragen
+        type: structure
+        fields:
+          question:
+            label: Frage
+            type: text
+          answer:
+            label: Antwort
+            type: textarea
+            buttons: false
+  sidebar:
+    width: 1/3
+    sections:
+      images: sections/images
+      seo:
+        type: fields
+        fields:
+          cover: fields/cover
+          seo: fields/seo

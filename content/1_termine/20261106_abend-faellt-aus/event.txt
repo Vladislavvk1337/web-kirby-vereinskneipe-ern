@@ -1,0 +1,105 @@
+Title: Demo: Kneipenabend im November
+
+----
+
+Location: 
+
+----
+
+Address: 
+
+----
+
+Allday: false
+
+----
+
+Audience: 
+
+----
+
+Admission: 
+
+----
+
+Publiccontact: 
+
+----
+
+Internalnote: 
+
+----
+
+Responsible: 
+
+----
+
+Conflictaccepted: false
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00
+
+----
+
+Changelog: 
+
+----
+
+Text: 
+
+----
+
+Doors: 
+
+----
+
+End: 2026-11-06 23:00:00
+
+----
+
+Cover: 
+
+----
+
+Gallery: 
+
+----
+
+Seotitle: 
+
+----
+
+Seodescription: 
+
+----
+
+Category: kneipenabend
+
+----
+
+Orgstatus: abgesagt
+
+----
+
+Start: 2026-11-06 19:00:00
+
+----
+
+Teaser: Beispiel für eine abgesagte Veranstaltung. Abgesagte Termine bleiben sichtbar, damit niemand vor verschlossener Tür steht.
+
+----
+
+Uuid: 0b370ab5bfff4a79

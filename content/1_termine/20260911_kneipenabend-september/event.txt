@@ -1,0 +1,109 @@
+Title: Demo-Kneipenabend im September
+
+----
+
+Location: 
+
+----
+
+Address: 
+
+----
+
+Allday: false
+
+----
+
+Audience: 
+
+----
+
+Admission: Eintritt frei
+
+----
+
+Publiccontact: 
+
+----
+
+Internalnote: 
+
+----
+
+Responsible: 
+
+----
+
+Conflictaccepted: false
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00
+
+----
+
+Changelog: 
+
+----
+
+Text: 
+
+----
+
+Doors: 
+
+----
+
+End: 2026-09-11 23:00:00
+
+----
+
+Cover: 
+
+----
+
+Gallery: 
+
+----
+
+Seotitle: 
+
+----
+
+Seodescription: 
+
+----
+
+Category: kneipenabend
+
+----
+
+Orgstatus: veroeffentlicht
+
+----
+
+Start: 2026-09-11 19:00:00
+
+----
+
+Team: - page://fd004b4db1ddec95
+
+----
+
+Teaser: Beispiel für einen regulären Kneipenabend, der bereits stattgefunden hat.
+
+----
+
+Uuid: 8c28494d58ded503

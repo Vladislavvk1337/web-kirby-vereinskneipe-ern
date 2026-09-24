@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Vorlage für Social-Sharing-Bilder (1200 × 630). Titelzeile anpassen,
+       dann mit tools/brand/render.mjs als PNG exportieren. -->
+  <rect width="1200" height="630" fill="#fbf7f0"/>
+  <path d="M0 470C120 410 230 430 330 400S560 330 700 380s260 30 360-20 140 10 140 10V630H0z" fill="#c9d8e2"/>
+  <path d="M0 510c110-40 210-30 320-60s230-50 360-10 250 20 340-10 180 10 180 10V630H0z" fill="#3f6f8f" opacity=".55"/>
+  <path d="M0 550c160-30 300-10 460-30s300-40 460-10 280 10 280 10V630H0z" fill="#17384f"/>
+  <path d="M0 588c200-14 420-8 620-16s400-10 580-4v20c-180-6-380-2-580 6S200 606 0 610z" fill="#edc06f" opacity=".8"/>
+  <path d="M770 576c40-74 220-74 260 0" fill="none" stroke="#e0a43a" stroke-width="10" stroke-linecap="round"/>
+  <g transform="translate(80 70) scale(1.6)">
+    <path d="M8 38C14 20 50 20 56 38" fill="none" stroke="#17384f" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="24.5" cy="37" r="5" fill="#17384f"/>
+    <circle cx="39.5" cy="37" r="5" fill="#17384f"/>
+    <rect x="6" y="46" width="52" height="7" rx="3.5" fill="#e0a43a"/>
+  </g>
+  <text x="200" y="140" font-family="Fraunces, Georgia, serif" font-size="40" font-weight="650" fill="#122e42">Ehrenamtskneipe Erndtebrück</text>
+  <text x="80" y="290" font-family="Fraunces, Georgia, serif" font-size="76" font-weight="650" fill="#122e42">Von Erndtebrück.</text>
+  <text x="80" y="375" font-family="Fraunces, Georgia, serif" font-size="76" font-weight="650" fill="#122e42">Für Erndtebrück. <tspan fill="#7f520a">Zusammen.</tspan></text>
+</svg>

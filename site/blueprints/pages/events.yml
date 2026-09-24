@@ -1,0 +1,75 @@
+title: Terminübersicht
+icon: calendar
+extends: options/container
+
+tabs:
+  events:
+    label: Termine
+    icon: calendar
+    sections:
+      drafts:
+        type: pages
+        headline: Entwürfe, Anfragen und zur Freigabe
+        status: draft
+        template: event
+        sortBy: start asc
+        layout: table
+        empty: Keine Entwürfe.
+        columns:
+          start:
+            label: Beginn
+            value: "{{ page.start.toDate('d.m.Y H:i') }}"
+            width: 1/6
+          orgstatus:
+            label: Status
+            width: 1/6
+          category:
+            label: Art
+            width: 1/6
+      upcoming:
+        type: pages
+        headline: Veröffentlicht – kommend
+        query: page.panelUpcoming
+        create: event
+        layout: table
+        empty: Keine kommenden veröffentlichten Termine.
+        columns:
+          start:
+            label: Beginn
+            value: "{{ page.start.toDate('d.m.Y H:i') }}"
+            width: 1/6
+          orgstatus:
+            label: Status
+            width: 1/6
+          category:
+            label: Art
+            width: 1/6
+      past:
+        type: pages
+        headline: Vergangen (Rückblick)
+        query: page.panelPast
+        create: false
+        layout: table
+        limit: 15
+        empty: Noch keine vergangenen Termine.
+        columns:
+          start:
+            label: Beginn
+            value: "{{ page.start.toDate('d.m.Y H:i') }}"
+            width: 1/6
+          orgstatus:
+            label: Status
+            width: 1/6
+          category:
+            label: Art
+            width: 1/6
+  page:
+    label: Seitentext
+    icon: text
+    fields:
+      intro:
+        label: Einleitung
+        type: textarea
+        buttons: false
+        size: small
+  seo: tabs/seo

@@ -1,0 +1,57 @@
+title: Moderation
+description: Termine, Thekenteams und Aktuelles pflegen und zur Freigabe vorbereiten
+permissions:
+  access:
+    panel: true
+    site: true
+    account: true
+    languages: false
+    system: false
+    users: false
+  site:
+    changeTitle: false
+    update: false
+  pages:
+    access: true
+    changeSlug: true
+    # im Freigabemodus zusätzlich per Hook gesperrt (siehe hooks.php)
+    changeStatus: true
+    changeTemplate: false
+    changeTitle: true
+    create: true
+    # Moderatoren löschen nur Entwürfe (Hook)
+    delete: true
+    duplicate: true
+    list: true
+    move: false
+    preview: true
+    read: true
+    sort: false
+    update: true
+  files:
+    access: true
+    changeName: true
+    changeTemplate: false
+    create: true
+    delete: true
+    list: true
+    read: true
+    replace: true
+    sort: true
+    update: true
+  languages: false
+  users: false
+  user:
+    access: true
+    changeEmail: true
+    changeLanguage: true
+    changeName: true
+    changePassword: true
+    changeRole: false
+    delete: false
+    list: true
+    update: true
+fields:
+  phoneinternal:
+    label: Telefon (intern)
+    type: tel

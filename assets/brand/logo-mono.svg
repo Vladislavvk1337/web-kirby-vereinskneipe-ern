@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="t">
+  <title id="t">Bildmarke der Ehrenamtskneipe Erndtebrück, einfarbig</title>
+  <!-- Einfarbige Variante: Farbe über currentColor bzw. hier Anthrazit -->
+  <g fill="#23272b">
+    <path d="M8 38C14 20 50 20 56 38" fill="none" stroke="#23272b" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="24.5" cy="37" r="5"/>
+    <circle cx="39.5" cy="37" r="5"/>
+    <rect x="6" y="46" width="52" height="7" rx="3.5"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+{
+  "name": "vereinskneipe/web-kirby-erndtebrueck",
+  "description": "Website der Ehrenamtskneipe Erndtebrück – Kirby CMS (Grundlage: Kirby Plainkit)",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+    "getkirby/cms": "^5.6"
+  },
+  "config": {
+    "allow-plugins": {
+      "getkirby/composer-installer": true
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "scripts": {
+    "start": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php -S localhost:8000 kirby/router.php"
+    ],
+    "test": "@php tests/run.php",
+    "lint": "find index.php site bin tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null",
+    "demo-media": "@php bin/demo-media.php"
+  }
+}

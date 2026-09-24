@@ -1,0 +1,37 @@
+Title: Demo-Meldung: Thekenteams für den Winter gesucht
+
+----
+
+Kind: meldung
+
+----
+
+Date: 2026-09-20
+
+----
+
+Teaser: Für die Wintermonate sind noch Abende frei. Ein Beispiel für eine kurze Meldung.
+
+----
+
+Text: <p>Im Kalender sind noch einige Termine frei. Ihr möchtet eine Thekenschicht übernehmen? Dann nutzt das Formular „Termin anfragen“.</p>
+
+----
+
+Uuid: 25d5a57e6be36025
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00

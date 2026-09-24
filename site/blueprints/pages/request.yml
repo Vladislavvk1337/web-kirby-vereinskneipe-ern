@@ -1,0 +1,125 @@
+title: Terminanfrage
+icon: email
+
+# Personenbezogene Daten: nie veröffentlichen, keine Vorschau.
+# Löschen nur durch die Administration (zusätzlich per Hook geprüft).
+status:
+  draft:
+    label: Anfrage
+    text: Wird nie veröffentlicht.
+
+options:
+  changeSlug: false
+  changeStatus: false
+  changeTemplate: false
+  changeTitle: false
+  duplicate: false
+  move: false
+  preview: false
+  create: false
+  delete:
+    admin: true
+    "*": false
+
+columns:
+  main:
+    width: 2/3
+    fields:
+      requestheadline:
+        type: headline
+        label: Angaben aus dem Formular
+        help: Nur lesbar. Die Anfrage wird automatisch nach Ablauf der Löschfrist gelöscht.
+      slotlabel:
+        label: Gewünschter Termin
+        type: text
+        disabled: true
+      slotpage:
+        label: Termin im Kalender
+        type: pages
+        multiple: false
+        disabled: true
+      wishdate:
+        label: Eigener Datumsvorschlag
+        type: date
+        display: DD.MM.YYYY
+        disabled: true
+        width: 1/2
+      altdate:
+        label: Alternativer Termin
+        type: date
+        display: DD.MM.YYYY
+        disabled: true
+        width: 1/2
+      groupname:
+        label: Gruppe
+        type: text
+        disabled: true
+        width: 1/2
+      grouptype:
+        label: Art der Gruppe
+        type: select
+        disabled: true
+        width: 1/2
+        options:
+          verein: Verein
+          unternehmen: Unternehmen
+          initiative: Initiative
+          privat: Private Gruppe
+      contactname:
+        label: Kontaktperson
+        type: text
+        disabled: true
+        width: 1/2
+      email:
+        label: E-Mail
+        type: email
+        disabled: true
+        width: 1/2
+      phone:
+        label: Telefon
+        type: tel
+        disabled: true
+        width: 1/2
+      submittedat:
+        label: Eingegangen am
+        type: date
+        time: true
+        display: DD.MM.YYYY
+        disabled: true
+        width: 1/2
+      intro:
+        label: Kurze Vorstellung
+        type: textarea
+        buttons: false
+        disabled: true
+      message:
+        label: Nachricht
+        type: textarea
+        buttons: false
+        disabled: true
+      privacy:
+        label: Datenschutz
+        type: text
+        disabled: true
+  sidebar:
+    width: 1/3
+    fields:
+      processing:
+        label: Bearbeitungsstand
+        type: select
+        default: neu
+        required: true
+        options:
+          neu: neu
+          inbearbeitung: in Bearbeitung
+          terminangelegt: Termin angelegt
+          abgelehnt: abgelehnt
+          erledigt: erledigt
+      handledby:
+        label: Bearbeitet von
+        type: users
+        multiple: false
+      processingnote:
+        label: Interne Notiz
+        type: textarea
+        buttons: false

@@ -1,0 +1,109 @@
+Title: Demo-Kneipenabend mit dem Beispiel-Thekenteam
+
+----
+
+Location: 
+
+----
+
+Address: 
+
+----
+
+Allday: false
+
+----
+
+Audience: alle Generationen
+
+----
+
+Admission: Eintritt frei
+
+----
+
+Publiccontact: Fragen zum Abend: kontakt@example.org
+
+----
+
+Internalnote: 
+
+----
+
+Responsible: 
+
+----
+
+Conflictaccepted: false
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00
+
+----
+
+Changelog: 
+
+----
+
+Text: <p>So könnte die ausführliche Beschreibung eines Abends aussehen: Wer steht hinter der Theke, was ist geplant, und worauf können sich Gäste freuen?</p><p>Dieser Text ist ein <strong>Demo-Inhalt</strong> und wird im Panel durch echte Angaben ersetzt.</p>
+
+----
+
+Doors: 18:30:00
+
+----
+
+End: 2026-10-02 23:30:00
+
+----
+
+Cover: - platzhalter-abend.jpg
+
+----
+
+Gallery: 
+
+----
+
+Seotitle: 
+
+----
+
+Seodescription: 
+
+----
+
+Category: thekenteam
+
+----
+
+Orgstatus: bestaetigt
+
+----
+
+Start: 2026-10-02 19:00:00
+
+----
+
+Team: - page://df1cdbc68a46e154
+
+----
+
+Teaser: Das Beispiel-Thekenteam übernimmt die Theke. Ein Demo-Termin, der zeigt, wie ein bestätigter Abend auf der Website erscheint.
+
+----
+
+Uuid: 82adc2f5465db881

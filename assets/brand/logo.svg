@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="t">
+  <title id="t">Bildmarke der Ehrenamtskneipe Erndtebrück</title>
+  <!-- Brückenbogen über der Theke, darunter zwei Menschen, die sich begegnen -->
+  <path d="M8 38C14 20 50 20 56 38" fill="none" stroke="#17384f" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="24.5" cy="37" r="5" fill="#17384f"/>
+  <circle cx="39.5" cy="37" r="5" fill="#17384f"/>
+  <rect x="6" y="46" width="52" height="7" rx="3.5" fill="#e0a43a"/>
+</svg>

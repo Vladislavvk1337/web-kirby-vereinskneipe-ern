@@ -1,0 +1,17 @@
+Template: image
+
+----
+
+Alt: Platzhalterbild: gezeichnete Szene mit Lichterkette über einer Theke
+
+----
+
+Caption: Platzhalterbild
+
+----
+
+Consent: keinepersonen
+
+----
+
+Uuid: ee6df8aff80cd115

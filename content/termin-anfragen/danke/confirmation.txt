@@ -1,0 +1,9 @@
+Title: Danke für eure Anfrage
+
+----
+
+Text: Eure Anfrage ist bei uns angekommen. Die Redaktion meldet sich in den nächsten Tagen bei euch. Bis dahin ist der Termin noch nicht fest vergeben.
+
+----
+
+Uuid: 032b7fcc66dbe3da

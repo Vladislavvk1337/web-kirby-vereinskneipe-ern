@@ -1,0 +1,10 @@
+# Dateiliste für Bilder einer Seite
+type: files
+headline: Bilder
+template: image
+layout: cards
+size: small
+image:
+  cover: true
+  ratio: 1/1
+info: "{{ file.alt.or('⚠ Alternativtext fehlt') }}"

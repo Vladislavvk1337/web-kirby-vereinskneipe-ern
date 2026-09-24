@@ -1,0 +1,234 @@
+/* ==========================================================================
+   Formulare – einspaltig, große Ziele, Fehler direkt am Feld.
+   Nur auf Formularseiten geladen.
+   ========================================================================== */
+
+.form {
+  display: grid;
+  gap: var(--ui-space-m);
+  margin-top: var(--ui-space-m);
+}
+
+.form__group {
+  margin: 0;
+  padding: var(--ui-space-m);
+  border: var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+  display: grid;
+  gap: var(--ui-space-m);
+  min-width: 0;
+}
+
+.form__group legend {
+  padding: 0 0.4em;
+  margin-left: -0.4em;
+  font-family: var(--ui-font-display);
+  font-size: var(--ui-step-2);
+  font-weight: 650;
+  color: var(--ui-heading);
+}
+
+.form__row {
+  display: grid;
+  gap: var(--ui-space-m);
+}
+
+@media (min-width: 40em) {
+  .form__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.form > *,
+.form__row > *,
+.field {
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-weight: 700;
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--ui-text-soft);
+}
+
+.field__hint {
+  margin: 0;
+  color: var(--ui-text-soft);
+  font-size: var(--ui-step--1);
+}
+
+.field__error {
+  display: flex;
+  gap: 0.4em;
+  align-items: flex-start;
+  margin: 0;
+  color: var(--ui-danger);
+  font-weight: 700;
+}
+
+.field__error .icon {
+  margin-top: 0.15em;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="tel"],
+.field input[type="date"],
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: var(--ui-touch);
+  padding: 0.55rem 0.75rem;
+  border: 2px solid var(--ui-ink-soft);
+  border-radius: var(--ui-radius-s);
+  background: var(--ui-white);
+  color: var(--ui-ink);
+  font: inherit;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Datumsfelder bringen in manchen Browsern eine Mindestbreite mit */
+.field input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.field--error input,
+.field--error select,
+.field--error textarea {
+  border-color: var(--ui-danger);
+  border-width: 3px;
+}
+
+.field--error {
+  padding-left: var(--ui-space-s);
+  border-left: 4px solid var(--ui-danger);
+}
+
+.form__group.field--error {
+  padding-left: var(--ui-space-m);
+  border-left-width: 6px;
+}
+
+.choices {
+  display: grid;
+  gap: var(--ui-space-2xs);
+}
+
+@media (min-width: 40em) {
+  .choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.choice {
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0;
+  transform: translateY(-50%);
+  accent-color: var(--ui-eder-800);
+}
+
+.choice label {
+  display: flex;
+  gap: var(--ui-space-2xs);
+  align-items: center;
+  min-height: 3.25rem;
+  padding: var(--ui-space-xs) var(--ui-space-s) var(--ui-space-xs) 3rem;
+  border: 2px solid var(--ui-ink-soft);
+  border-radius: var(--ui-radius-s);
+  background: var(--ui-white);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.choice input:checked + label {
+  border-color: var(--ui-eder-800);
+  background: var(--ui-eder-100);
+  box-shadow: inset 0 0 0 1px var(--ui-eder-800);
+}
+
+.choice input:focus-visible + label {
+  outline: 3px solid var(--ui-focus);
+  outline-offset: 2px;
+}
+
+.choice--check input {
+  top: 0.85rem;
+  transform: none;
+}
+
+.choice--check label {
+  display: block;
+  font-weight: 400;
+}
+
+.field--check {
+  padding: 0;
+}
+
+.form__hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__submit {
+  display: grid;
+  gap: var(--ui-space-2xs);
+  justify-items: start;
+}
+
+@media (max-width: 39.99em) {
+  .form__submit .button {
+    width: 100%;
+  }
+}
+
+.error-summary {
+  margin-bottom: var(--ui-space-m);
+  padding: var(--ui-space-m);
+  border: 3px solid var(--ui-danger);
+  border-radius: var(--ui-radius);
+  background: var(--ui-danger-100);
+}
+
+.error-summary h2 {
+  font-size: var(--ui-step-2);
+  color: var(--ui-danger);
+}
+
+.error-summary ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.error-summary a {
+  color: var(--ui-ink);
+  font-weight: 700;
+}

@@ -1,0 +1,9 @@
+Template: logo
+
+----
+
+Alt: Logo des Beispiel-Thekenteams
+
+----
+
+Uuid: 45f523198f2e379d

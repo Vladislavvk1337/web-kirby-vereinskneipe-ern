@@ -1,0 +1,200 @@
+title: Termin
+icon: calendar
+# Veröffentlichte Termine werden nach Datum nummeriert (Ordner 20261002_…)
+num: '{{ page.start.toDate("Ymd") }}'
+
+status:
+  draft:
+    label: Entwurf
+    text: Nur im Panel sichtbar – in Planung, angefragt oder zur Freigabe.
+  listed:
+    label: Veröffentlicht
+    text: Auf der Website sichtbar, wenn der Terminstatus öffentlich ist (frei, bestätigt, abgesagt, geschlossen).
+
+options:
+  changeTemplate: false
+  move: false
+  sort: false
+
+create:
+  title:
+    label: Titel des Termins
+  # Datum im Slug, damit gleichnamige Termine eindeutige Adressen erhalten
+  slug: "{{ page.title.slug }}-{{ page.start.toDate('d-m-Y') }}"
+  fields:
+    - start
+    - category
+    - orgstatus
+  status: draft
+  redirect: true
+
+tabs:
+  content:
+    label: Termin
+    icon: calendar
+    columns:
+      main:
+        width: 2/3
+        sections:
+          status:
+            type: fields
+            fields:
+              conflictinfo:
+                label: Überschneidungen
+                type: info
+                theme: info
+                text: "{{ page.conflictInfo }}"
+              completeness:
+                label: Vollständigkeit
+                type: info
+                theme: passive
+                text: "{{ page.missingInfoText }}"
+              category:
+                label: Terminart
+                type: select
+                required: true
+                width: 1/2
+                default: kneipenabend
+                options:
+                  kneipenabend: Regulärer Kneipenabend
+                  thekenteam: Thekenteam
+                  sonder: Sonderveranstaltung
+                  senioren: Seniorennachmittag
+                  kultur: Kultur oder Musik
+                  privat: Private oder interne Veranstaltung
+                  geschlossen: Geschlossen
+              orgstatus:
+                label: Terminstatus (organisatorisch)
+                type: select
+                required: true
+                width: 1/2
+                default: frei
+                options:
+                  frei: frei
+                  angefragt: angefragt (intern)
+                  reserviert: reserviert (intern)
+                  freigabe: zur Freigabe (intern)
+                  bestaetigt: bestätigt
+                  veroeffentlicht: veröffentlicht
+                  abgesagt: abgesagt
+                  geschlossen: geschlossen
+                  archiviert: archiviert
+                help: Öffentlich erscheinen nur frei, bestätigt/veröffentlicht, abgesagt und geschlossen – und nur, wenn der Termin veröffentlicht ist. Im Freigabemodus setzt nur die Administration „bestätigt“ oder „veröffentlicht“.
+          when:
+            type: fields
+            fields:
+              start:
+                label: Beginn
+                type: date
+                time:
+                  step: 15
+                display: DD.MM.YYYY
+                required: true
+                width: 1/2
+              end:
+                label: Ende
+                type: date
+                time:
+                  step: 15
+                display: DD.MM.YYYY
+                width: 1/2
+                help: Leer = 4 Stunden nach Beginn (für Kalender und Überschneidungsprüfung).
+              allday:
+                label: Ganztägig
+                type: toggle
+                width: 1/2
+                text:
+                  - Nein
+                  - Ja, ohne Uhrzeit
+              doors:
+                label: Einlass
+                type: time
+                step: 15
+                width: 1/2
+                when:
+                  allday: false
+          text:
+            type: fields
+            fields:
+              teaser:
+                label: Kurzbeschreibung
+                type: textarea
+                buttons: false
+                maxlength: 300
+                counter: true
+                help: Ein bis zwei Sätze für Terminlisten und die Startseite.
+              text:
+                extends: fields/richtext
+                label: Ausführliche Beschreibung
+              team:
+                label: Thekenteam
+                type: pages
+                multiple: false
+                query: site.find('thekenteams').childrenAndDrafts
+                help: Öffentlich erscheint das Team nur mit Einwilligung zur Veröffentlichung.
+              audience:
+                label: Zielgruppe
+                type: text
+                width: 1/2
+                placeholder: z. B. alle Generationen, Familien, Seniorinnen und Senioren
+              admission:
+                label: Eintritt
+                type: text
+                width: 1/2
+                placeholder: z. B. Eintritt frei
+              publiccontact:
+                label: Öffentliche Kontaktinformation
+                type: text
+                help: Wird auf der Website angezeigt. Nur allgemeine Angaben (z. B. Vereinsadresse) – keine privaten Nummern.
+      sidebar:
+        width: 1/3
+        sections:
+          place:
+            type: fields
+            fields:
+              location:
+                label: Veranstaltungsort
+                type: text
+                placeholder: "{{ site.venue.or('Name der Kneipe') }}"
+                help: Leer = Ort aus den Stammdaten.
+              address:
+                label: Adresse
+                type: textarea
+                buttons: false
+                size: small
+                help: Leer = Adresse aus den Stammdaten.
+          media:
+            type: fields
+            fields:
+              cover: fields/cover
+              gallery: fields/gallery
+          images: sections/images
+          internal:
+            type: fields
+            fields:
+              internalheadline:
+                type: headline
+                label: Intern – nie öffentlich
+              internalnote:
+                label: Interne Notiz
+                type: textarea
+                buttons: false
+                size: small
+              responsible:
+                label: Verantwortlich in der Redaktion
+                type: users
+                multiple: false
+              conflictaccepted:
+                label: Überschneidung zulassen
+                type: toggle
+                text:
+                  - Nein
+                  - Ja, bewusst doppelt belegt
+                help: Nur für die Administration. Nötig, um einen Termin trotz Überschneidung zu bestätigen oder zu veröffentlichen.
+  seo: tabs/seo
+  history:
+    label: Bearbeitung
+    icon: clock
+    fields:
+      meta: fields/meta
+      changelog: fields/changelog

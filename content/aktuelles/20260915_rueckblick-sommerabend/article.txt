@@ -1,0 +1,45 @@
+Title: Rückblick (Demo): Sommerabend an der Theke
+
+----
+
+Kind: rueckblick
+
+----
+
+Date: 2026-09-15
+
+----
+
+Teaser: Ein Beispiel für einen Rückblick auf einen vergangenen Abend – mit Bild und kurzem Bericht.
+
+----
+
+Text: <p>So kann ein Rückblick aussehen: Wer war hinter der Theke, wie war die Stimmung, was bleibt in Erinnerung? Dieser Beitrag ist ein <strong>Demo-Inhalt</strong>.</p>
+
+----
+
+Event: - page://dd57997bffdb68cb
+
+----
+
+Cover: - platzhalter-rueckblick.jpg
+
+----
+
+Uuid: 856439c26bcbc450
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00

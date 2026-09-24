@@ -1,0 +1,10 @@
+label: Titelbild
+type: files
+multiple: false
+query: page.images
+uploads: image
+layout: cards
+image:
+  cover: true
+  ratio: 3/2
+help: Querformat, mindestens 1600 px breit. Bitte Alternativtext beim Bild pflegen.

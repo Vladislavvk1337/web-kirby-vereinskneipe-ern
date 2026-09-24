@@ -1,0 +1,39 @@
+title: Thekenteams-Übersicht
+icon: users
+extends: options/container
+
+tabs:
+  teams:
+    label: Thekenteams
+    icon: users
+    sections:
+      drafts:
+        type: pages
+        headline: Entwürfe
+        status: draft
+        template: team
+        layout: list
+        empty: Keine Entwürfe.
+        info: "{{ page.typeLabel }}"
+      teams:
+        type: pages
+        headline: Veröffentlicht
+        status: listed
+        template: team
+        layout: cards
+        size: small
+        image:
+          query: page.logo.toFile ?? page.cover.toFile
+          cover: false
+          back: white
+        info: "{{ page.typeLabel }}{{ page.consent.toBool ? '' : ' · ⚠ Einwilligung fehlt – nicht öffentlich' }}"
+  page:
+    label: Seitentext
+    icon: text
+    fields:
+      intro:
+        label: Einleitung
+        type: textarea
+        buttons: false
+        size: small
+  seo: tabs/seo

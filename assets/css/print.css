@@ -1,0 +1,31 @@
+/* Druckansicht: Inhalte ohne Navigation und dunkle Flächen */
+.site-header,
+.site-nav,
+.skip-link,
+.filters,
+.calendar__tools,
+.month-nav,
+.landscape,
+.hero__actions,
+.site-footer__bottom nav {
+  display: none !important;
+}
+
+body {
+  background: #fff;
+  color: #000;
+  font-size: 11pt;
+}
+
+.next,
+.next__card,
+.section--join,
+.site-footer {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+a[href^="http"]::after {
+  content: " (" attr(href) ")";
+  font-size: 0.85em;
+}

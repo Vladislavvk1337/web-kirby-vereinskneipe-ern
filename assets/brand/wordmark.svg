@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120" role="img" aria-labelledby="t">
+  <title id="t">Ehrenamtskneipe Erndtebrück</title>
+  <!-- Wortmarke: Bildmarke + Arbeitstitel. Der Name ist vorläufig und wird
+       auf der Website aus dem Panel gelesen; diese Datei dient als Vorlage
+       für Druck und Social Media. Schrift: Fraunces (OFL). -->
+  <g transform="translate(8 20) scale(1.25)">
+    <path d="M8 38C14 20 50 20 56 38" fill="none" stroke="#17384f" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="24.5" cy="37" r="5" fill="#17384f"/>
+    <circle cx="39.5" cy="37" r="5" fill="#17384f"/>
+    <rect x="6" y="46" width="52" height="7" rx="3.5" fill="#e0a43a"/>
+  </g>
+  <text x="100" y="58" font-family="Fraunces, Georgia, serif" font-size="34" font-weight="650" fill="#122e42">Ehrenamtskneipe</text>
+  <text x="100" y="96" font-family="Fraunces, Georgia, serif" font-size="34" font-weight="400" fill="#7f520a">Erndtebrück</text>
+</svg>

@@ -1,0 +1,8 @@
+title: Bausteine (Design-System)
+icon: palette
+extends: options/admin-only
+
+fields:
+  info:
+    type: info
+    text: Übersicht aller Gestaltungsbausteine unter /bausteine – nicht verlinkt und nicht indexiert.

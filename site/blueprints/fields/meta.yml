@@ -1,0 +1,35 @@
+# Bearbeitungsinformationen – werden per Hook gesetzt (site/plugins/kneipe/hooks.php)
+type: group
+fields:
+  metaheadline:
+    type: headline
+    label: Bearbeitung
+  createdby:
+    label: Erstellt von
+    type: text
+    disabled: true
+    width: 1/2
+  createdat:
+    label: Erstellt am
+    type: date
+    time: true
+    display: DD.MM.YYYY
+    disabled: true
+    width: 1/2
+  modifiedby:
+    label: Zuletzt bearbeitet von
+    type: text
+    disabled: true
+    width: 1/2
+  modifiedat:
+    label: Zuletzt bearbeitet am
+    type: date
+    time: true
+    display: DD.MM.YYYY
+    disabled: true
+    width: 1/2
+  changenote:
+    label: Änderungsnotiz
+    type: text
+    icon: edit
+    help: Kurz notieren, was und warum geändert wurde. Wird beim Speichern ins Protokoll übernommen und dann geleert.

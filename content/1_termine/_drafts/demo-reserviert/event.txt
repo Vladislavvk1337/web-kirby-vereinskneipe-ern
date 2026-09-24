@@ -1,0 +1,105 @@
+Title: Demo: reservierter Abend
+
+----
+
+Location: 
+
+----
+
+Address: 
+
+----
+
+Allday: false
+
+----
+
+Audience: 
+
+----
+
+Admission: 
+
+----
+
+Publiccontact: 
+
+----
+
+Internalnote: 
+
+----
+
+Responsible: 
+
+----
+
+Conflictaccepted: false
+
+----
+
+Createdby: Demo-Inhalt
+
+----
+
+Createdat: 2026-09-24 10:00:00
+
+----
+
+Modifiedby: Demo-Inhalt
+
+----
+
+Modifiedat: 2026-09-24 10:00:00
+
+----
+
+Changelog: 
+
+----
+
+Text: 
+
+----
+
+Doors: 
+
+----
+
+End: 
+
+----
+
+Cover: 
+
+----
+
+Gallery: 
+
+----
+
+Seotitle: 
+
+----
+
+Seodescription: 
+
+----
+
+Category: thekenteam
+
+----
+
+Orgstatus: reserviert
+
+----
+
+Start: 2026-12-04 19:00:00
+
+----
+
+Teaser: 
+
+----
+
+Uuid: 1f87509b1aecc04f

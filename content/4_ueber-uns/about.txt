@@ -1,0 +1,31 @@
+Title: Über uns
+
+----
+
+Navtitle: Über uns
+
+----
+
+Intro: Die Ehrenamtskneipe ist ein Ort der Begegnung für Erndtebrück und die Ortsteile – getragen von vielen Gruppen, die abwechselnd hinter der Theke stehen.
+
+----
+
+Text: <h2>Die Idee</h2><p>Eine Kneipe, in der sich Menschen begegnen, die sich sonst vielleicht nie über den Weg laufen würden: Jung und Alt, Alteingesessene und Neue, Vereinsmitglieder und alle, die einfach auf ein Getränk vorbeikommen.</p><p>Das Besondere: Die Theke übernimmt jedes Mal eine andere Gruppe – ehrenamtlich. So lernt man die Vereine, Initiativen und Betriebe aus dem Ort von einer neuen Seite kennen.</p><h2>Wer steckt dahinter?</h2><p>[Platzhalter: Träger, Verein oder Initiative, die die Kneipe verantwortet – mit kurzer Beschreibung.]</p>
+
+----
+
+Facts:
+
+- 
+  title: Ehrenamtlich
+  text: Jeder Abend wird von einer Gruppe gestaltet, die sich freiwillig engagiert.
+- 
+  title: Für alle offen
+  text: Gäste aus allen Generationen und aus allen Ortsteilen sind willkommen.
+- 
+  title: Von vielen getragen
+  text: Vereine, Initiativen, Unternehmen und private Gruppen wechseln sich ab.
+
+----
+
+Uuid: 5780daf6db0b013d

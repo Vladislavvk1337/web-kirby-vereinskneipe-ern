@@ -1,0 +1,9 @@
+Template: logo
+
+----
+
+Alt: Logo der Beispiel-Initiative
+
+----
+
+Uuid: 5d86df048f9279ac

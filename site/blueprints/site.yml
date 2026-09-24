@@ -1,0 +1,108 @@
+# Panel-Startseite: Dashboard für die Redaktion.
+# Die Reiter „Stammdaten“ und „Einstellungen“ sehen nur Administratoren
+# (site/plugins/kneipe/blueprints.php); Moderatoren sehen dort einen Hinweis.
+title: Ehrenamtskneipe
+
+tabs:
+  dashboard:
+    label: Übersicht
+    icon: dashboard
+    columns:
+      - width: 1/1
+        sections:
+          mode:
+            type: info
+            headline: Freigabe
+            text: "{{ site.dashboardApprovalMode }}"
+          stats:
+            type: stats
+            label: Auf einen Blick
+            size: medium
+            reports:
+              - label: Offene Anfragen
+                value: "{{ site.dashboardRequests.count }}"
+                link: pages/anfragen
+                icon: email
+              - label: Zur Freigabe
+                value: "{{ site.dashboardApproval.count }}"
+                link: pages/termine
+                icon: check
+              - label: Freie Termine
+                value: "{{ site.dashboardFree.count }}"
+                link: pages/termine
+                icon: calendar
+              - label: Überschneidungen
+                value: "{{ site.dashboardConflicts.count }}"
+                link: pages/termine
+                icon: alert
+      - width: 1/2
+        sections:
+          next:
+            type: pages
+            headline: Nächster bestätigter Termin
+            query: site.dashboardNext
+            create: false
+            layout: list
+            empty: Kein bestätigter Termin in Sicht.
+            info: "{{ page.start.toDate('d.m.Y H:i') }} Uhr"
+          requests:
+            type: pages
+            headline: Offene Anfragen
+            query: site.dashboardRequests
+            create: false
+            layout: list
+            empty: Keine offenen Anfragen.
+            info: "{{ page.submittedat.toDate('d.m.Y') }} · {{ page.processing }}"
+          approval:
+            type: pages
+            headline: Termine zur Freigabe
+            query: site.dashboardApproval
+            create: false
+            layout: list
+            empty: Nichts zur Freigabe.
+            info: "{{ page.start.toDate('d.m.Y H:i') }} · {{ page.orgstatus }}"
+          conflicts:
+            type: pages
+            headline: Überschneidungen
+            query: site.dashboardConflicts
+            create: false
+            layout: list
+            empty: Keine Doppelbelegungen.
+            info: "{{ page.start.toDate('d.m.Y H:i') }}"
+      - width: 1/2
+        sections:
+          free:
+            type: pages
+            headline: Freie Termine
+            query: site.dashboardFree
+            create: false
+            layout: list
+            limit: 6
+            empty: Keine freien Termine eingetragen.
+            info: "{{ page.start.toDate('d.m.Y H:i') }}{{ page.isDraft ? ' · Entwurf' : '' }}"
+          incomplete:
+            type: pages
+            headline: Unvollständige Termine
+            query: site.dashboardIncomplete
+            create: false
+            layout: list
+            limit: 6
+            empty: Alle kommenden Termine sind vollständig.
+            info: "{{ page.missingInfoText }}"
+          teams:
+            type: pages
+            headline: Aktuelle Thekenteams
+            query: site.dashboardTeams
+            create: false
+            layout: list
+            empty: Noch keinem kommenden Termin ist ein Team zugeordnet.
+            info: "{{ page.typeLabel }}"
+          recent:
+            type: pages
+            headline: Zuletzt bearbeitet
+            query: site.dashboardRecent
+            create: false
+            layout: list
+            info: "{{ page.modified('d.m.Y H:i') }}"
+  masterdata: tabs/site-masterdata
+  settings: tabs/site-settings

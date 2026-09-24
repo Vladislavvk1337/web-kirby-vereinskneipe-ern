@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Design-Tokens – einzige Quelle für Farben, Schriften und Abstände.
+   Alle Variablen tragen das Präfix --ui-.
+
+   Farbwelt: dunkles Eder-Blau, warmes Bernstein, Creme, Anthrazit und
+   sehr sparsam ein gedecktes Moosgrün. Kontraste nach WCAG (auf --ui-cream-50):
+     --ui-ink        14,1 : 1   Fließtext
+     --ui-ink-soft    7,9 : 1   Nebentext, Formularrahmen
+     --ui-eder-700    9,2 : 1   Links
+     --ui-amber-800   6,3 : 1   Akzenttext
+     --ui-moss-600    6,5 : 1   Status „frei“
+     --ui-danger      6,4 : 1   Fehler, „abgesagt“
+   Bernstein-Knopf (--ui-amber-400) mit --ui-ink: 6,8 : 1
+   Auf Eder-Blau (--ui-eder-900): Creme 13,2 : 1, --ui-amber-300 8,3 : 1
+   Fokusrahmen: --ui-eder-950 auf Creme 15,2 : 1, auf dunklem Grund
+   --ui-amber-300.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/fraunces-latin-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("../fonts/atkinson-hyperlegible-next-latin-var.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("../fonts/atkinson-hyperlegible-next-latin-var-italic.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Farben */
+  --ui-eder-950: #0c2232;
+  --ui-eder-900: #122e42;
+  --ui-eder-800: #17384f;
+  --ui-eder-700: #1d4764;
+  --ui-eder-500: #3f6f8f;
+  --ui-eder-200: #c9d8e2;
+  --ui-eder-100: #e4ecf1;
+
+  --ui-amber-800: #7f520a;
+  --ui-amber-600: #b87a14;
+  --ui-amber-400: #e0a43a;
+  --ui-amber-300: #edc06f;
+  --ui-amber-100: #f7e7c7;
+
+  --ui-cream-50: #fbf7f0;
+  --ui-cream-100: #f5eee1;
+  --ui-cream-200: #ebdfc9;
+  --ui-cream-300: #dccbad;
+
+  --ui-ink: #23272b;
+  --ui-ink-soft: #484e55;
+  --ui-white: #fffdf9;
+
+  --ui-moss-600: #44613f;
+  --ui-moss-100: #e3eadb;
+  --ui-danger: #a3342b;
+  --ui-danger-100: #f6e0dc;
+  --ui-warning-100: #faedcf;
+
+  /* Rollen */
+  --ui-bg: var(--ui-cream-50);
+  --ui-surface: var(--ui-white);
+  --ui-surface-warm: var(--ui-cream-100);
+  --ui-text: var(--ui-ink);
+  --ui-text-soft: var(--ui-ink-soft);
+  --ui-heading: var(--ui-eder-900);
+  --ui-link: var(--ui-eder-700);
+  --ui-link-hover: var(--ui-eder-950);
+  --ui-line: var(--ui-cream-300);
+  --ui-focus: var(--ui-eder-950);
+  --ui-focus-halo: var(--ui-amber-300);
+
+  /* Schrift */
+  --ui-font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --ui-font-text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Fluide Schriftgrößen: Fließtext nie unter 17 px */
+  --ui-step--1: clamp(0.9375rem, 0.91rem + 0.12vw, 1rem);
+  --ui-step-0: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);
+  --ui-step-1: clamp(1.1875rem, 1.12rem + 0.35vw, 1.375rem);
+  --ui-step-2: clamp(1.375rem, 1.24rem + 0.65vw, 1.75rem);
+  --ui-step-3: clamp(1.625rem, 1.4rem + 1.1vw, 2.25rem);
+  --ui-step-4: clamp(2rem, 1.62rem + 1.9vw, 3.125rem);
+  --ui-step-5: clamp(2.375rem, 1.8rem + 2.9vw, 4.25rem);
+
+  --ui-leading: 1.6;
+  --ui-leading-tight: 1.15;
+
+  /* Abstände */
+  --ui-space-3xs: 0.25rem;
+  --ui-space-2xs: 0.5rem;
+  --ui-space-xs: 0.75rem;
+  --ui-space-s: 1rem;
+  --ui-space-m: clamp(1.25rem, 1.1rem + 0.7vw, 1.75rem);
+  --ui-space-l: clamp(2rem, 1.7rem + 1.4vw, 3rem);
+  --ui-space-xl: clamp(3rem, 2.4rem + 2.8vw, 5rem);
+  --ui-space-2xl: clamp(4rem, 3rem + 4.5vw, 7rem);
+
+  /* Form */
+  --ui-radius-s: 6px;
+  --ui-radius: 12px;
+  --ui-radius-l: 20px;
+  --ui-border: 1px solid var(--ui-line);
+  --ui-shadow: 0 1px 2px rgb(18 46 66 / 0.08), 0 8px 24px -12px rgb(18 46 66 / 0.18);
+
+  --ui-container: 72rem;
+  --ui-container-narrow: 46rem;
+  --ui-gutter: clamp(1rem, 0.6rem + 2vw, 2rem);
+  --ui-touch: 44px;
+}

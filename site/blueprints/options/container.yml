@@ -1,0 +1,22 @@
+# Übersichtsseiten (Termine, Thekenteams, Aktuelles): Moderatoren legen
+# darunter Einträge an, ändern die Seite selbst aber nicht
+options:
+  update:
+    admin: true
+    "*": false
+  changeSlug:
+    admin: true
+    "*": false
+  changeStatus:
+    admin: true
+    "*": false
+  changeTitle:
+    admin: true
+    "*": false
+  changeTemplate: false
+  delete: false
+  duplicate: false
+  move: false
+  sort:
+    admin: true
+    "*": false

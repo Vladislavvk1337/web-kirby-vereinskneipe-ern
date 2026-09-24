@@ -1,0 +1,21 @@
+Title: Kontakt und Anfahrt
+
+----
+
+Navtitle: Kontakt
+
+----
+
+Intro: Ihr habt eine Frage oder einen Hinweis? Schreibt uns eine E-Mail. Für Thekenschichten nutzt am besten das Formular „Termin anfragen“.
+
+----
+
+Directions: <p>[Platzhalter: Beschreibung der Anfahrt – Bushaltestelle, Parkmöglichkeiten, Fußweg.]</p>
+
+----
+
+Accessibility: [Platzhalter: Angaben zum Zugang, z. B. Stufen am Eingang oder barrierefreie Toilette – nur geprüfte Angaben eintragen.]
+
+----
+
+Uuid: 1a73af9e7ae00182
