@@ -334,7 +334,7 @@ Cluster; Konten legt man wie in Kapitel 7 mit `podman exec -i` an.
 
 | Variable | Standard | Zweck | Wohin |
 | --- | --- | --- | --- |
-| `KNEIPE_ADMIN_USERNAME`, `KNEIPE_ADMIN_EMAIL` | – | erstes Administrationskonto, nur wenn noch keins existiert | Secret |
+| `KNEIPE_ADMIN_USERNAME`, `KNEIPE_ADMIN_EMAIL` | `admin` (Benutzername) | erstes Administrationskonto, nur wenn noch keins existiert | Secret |
 | `KNEIPE_ADMIN_PASSWORD` | – | Passwort dazu (≥ 12 Zeichen); danach aus dem Secret entfernbar | **Secret** |
 | `KNEIPE_ADMIN_NAME` | `Administration` | Anzeigename des Erstkontos | Secret/ConfigMap |
 | `KNEIPE_ALLOW_WEB_SETUP` | `false` | staging/production ohne Konto trotzdem starten (Einrichtung über `/admin` – nur in geschützter Umgebung) | ConfigMap |
@@ -983,6 +983,37 @@ Migrationswerkzeug liest nur und schreibt in ein getrenntes Ziel.
     `kubectl -n kneipe exec deploy/kneipe-web -- tar -C /data/pages -czf - anfragen > anfragen.tar.gz`).
     Den alten Server erst nach einer stabilen Phase (Vorschlag: 4 Wochen)
     abschalten; sein letztes Backup bis zum Ende der Löschfrist aufbewahren.
+
+### Umgebungsvariablen der Kirby-Fassung
+
+Das Grav-Image wertet keine `KIRBY_*`-Variablen aus. Eine alte `.env`-Datei
+oder ein altes Secret also nicht weiterverwenden, sondern nach `.env.example`
+bzw. `k8s/base/secret.example.yaml` neu anlegen. Findet der Entrypoint noch
+`KIRBY_*`-Variablen, nennt er beim Start je Variable den Nachfolger (ohne
+Werte auszugeben).
+
+Meldet ein Container `KIRBY_CONTENT_SALT fehlt`, läuft noch das **alte
+Kirby-Image** (z. B. ein älteres `:latest` oder ein lokal gebautes Image aus
+`kirby-legacy`): Image neu ziehen (`docker pull …`, in Kubernetes
+`imagePullPolicy` bzw. Tag prüfen) oder aus dem aktuellen Stand neu bauen.
+
+| Kirby | Grav |
+| --- | --- |
+| `KIRBY_URL` | `GRAV_CONFIG__system__custom_base_url` (dazu `GRAV_CONFIG=true`, im Image gesetzt) |
+| `KIRBY_CONTENT_SALT`, `KIRBY_COOKIE_KEY` | entfallen; neu und optional: `GRAV_NONCE_KEY`, `GRAV_API_JWT_SECRET` (sonst erzeugt Grav sie auf dem Volume) |
+| `KIRBY_DEBUG` | `GRAV_ENVIRONMENT=dev` (nur lokal) |
+| `KIRBY_NOINDEX` | `KNEIPE_NOINDEX` |
+| `KIRBY_TIMEZONE` | `PHP_TIMEZONE` |
+| `KIRBY_MAIL_TRANSPORT` | `GRAV_CONFIG__plugins__email__mailer__engine` (`smtp`) |
+| `KIRBY_SMTP_HOST`, `…_PORT`, `…_SECURITY`, `…_USER`, `…_PASSWORD` | `GRAV_CONFIG__plugins__email__mailer__smtp__server`, `…__port`, `…__encryption`, `…__user`, `…__password` |
+| `KIRBY_MAIL_FROM`, `KIRBY_MAIL_FROM_NAME` | `GRAV_CONFIG__plugins__email__from`, `GRAV_CONFIG__plugins__email__from_name` |
+| `KNEIPE_ADMIN_EMAIL`, `KNEIPE_ADMIN_PASSWORD`, `KNEIPE_ADMIN_NAME` | bleiben; **neu**: `KNEIPE_ADMIN_USERNAME` – Anmeldung mit Benutzername, ohne Angabe `admin` |
+| `KIRBY_NEW_PASSWORD` | entfällt (Erstkonto über `KNEIPE_ADMIN_*`, Passwort später im Admin ändern) |
+| `KIRBY_CONTENT_ROOT`, `KIRBY_MEDIA_ROOT`, `KIRBY_STORAGE_ROOT`, `KIRBY_ENV_FILE` | entfallen; alle Daten unter `GRAV_DATA_DIR` (`/data`) |
+| `KNEIPE_RATE_LIMIT`, `KNEIPE_MIN_SECONDS`, `KNEIPE_ACCESS_LOG`, `KNEIPE_SEED_CONTENT` | unverändert |
+
+Das Volume der Kirby-Fassung (`content/`, `site/accounts/`) kann nicht direkt
+eingehängt werden; die Inhalte laufen über das Migrationswerkzeug (Schritt 3).
 
 ## 28. Testplan
 

@@ -152,6 +152,23 @@ jobs:
           ! docker run --rm kneipe-web:test
           ! docker run --rm -e GRAV_CONFIG__system__custom_base_url=https://example.org kneipe-web:test
 
+          # Alte Kirby-Umgebung: KIRBY_*-Variablen werden mit Nachfolger genannt,
+          # ohne Werte; das Erstkonto heißt ohne Benutzernamen „admin“
+          docker run -d --name kneipe-alt -p 8081:8080 --read-only --tmpfs /tmp:uid=33,gid=33 --tmpfs /data:uid=33,gid=33 \
+            -e GRAV_CONFIG__system__custom_base_url=http://localhost:8081 \
+            -e KIRBY_URL=http://localhost:8081 -e KIRBY_CONTENT_SALT=wert-salz-ci -e KIRBY_SMTP_PASSWORD=wert-smtp-ci \
+            -e KNEIPE_ADMIN_EMAIL=admin@example.org -e KNEIPE_ADMIN_PASSWORD=ci-test-passwort-123 \
+            kneipe-web:test
+          for i in $(seq 1 30); do curl -fsS http://localhost:8081/readyz && break; sleep 1; done
+          logs="$(docker logs kneipe-alt 2>&1)"
+          grep -q 'KIRBY_URL → GRAV_CONFIG__system__custom_base_url' <<< "$logs"
+          grep -q 'Erstes Administrationskonto admin angelegt' <<< "$logs"
+          ! grep -q 'wert-' <<< "$logs"
+          ! grep -q 'KIRBY_CONTENT_SALT fehlt' <<< "$logs"
+          curl -fsS -o /dev/null -X POST http://localhost:8081/api/v1/auth/token -H 'Content-Type: application/json' \
+            -d '{"username":"admin","password":"ci-test-passwort-123"}'
+          docker rm -f kneipe-alt
+
       - name: Schwachstellen-Scan (Trivy)
         env:
           TRIVY: '0.74.0'

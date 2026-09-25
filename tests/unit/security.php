@@ -179,3 +179,23 @@ test('Kubernetes: Pod Security „restricted“, Probes, Volume, NetworkPolicy',
 	$production = file_get_contents(dirname(__DIR__, 2) . '/k8s/overlays/production/kustomization.yaml');
 	assert_not_contains('newTag: latest', $production, 'Produktion mit fester Version');
 });
+
+test('Entrypoint nennt für Kirby-Variablen die Grav-Nachfolger und bricht nicht wegen ihnen ab', function () use ($root) {
+	$env = [
+		'PATH'                => getenv('PATH'),
+		'GRAV_ENVIRONMENT'    => 'production',
+		'KIRBY_URL'           => 'https://www.example.org',
+		'KIRBY_CONTENT_SALT'  => 'Wert-1f9c-salz',
+		'KIRBY_SMTP_PASSWORD' => 'Wert-7a2e-passwort',
+	];
+	$process = proc_open(['bash', $root . '/scripts/entrypoint.sh', 'true'], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $root, $env);
+	$output  = stream_get_contents($pipes[1]) . stream_get_contents($pipes[2]);
+	$status  = proc_close($process);
+
+	assert_same(1, $status, 'ohne Basis-URL startet der Container nicht');
+	assert_contains('KIRBY_URL → GRAV_CONFIG__system__custom_base_url', $output);
+	assert_contains('KIRBY_SMTP_PASSWORD → GRAV_CONFIG__plugins__email__mailer__smtp__password', $output);
+	assert_contains('FEHLER: GRAV_CONFIG__system__custom_base_url', $output);
+	assert_not_contains('KIRBY_CONTENT_SALT fehlt', $output);
+	assert_not_contains('Wert-', $output, 'Werte werden nie ausgegeben');
+});

@@ -30,6 +30,40 @@ fail() { echo "[entrypoint] FEHLER: $*" >&2; exit 1; }
 is_true() { [[ "${1,,}" =~ ^(1|true|yes|on|ja)$ ]]; }
 
 # --- 1. Konfiguration prüfen -------------------------------------------------
+# Variablen der früheren Kirby-Fassung wertet Grav nicht aus. Wer eine alte
+# .env-Datei oder ein altes Secret weiterverwendet, erfährt hier, wie die
+# Variablen jetzt heißen (Docker.md, Kapitel 27).
+kirby_replacement() {
+  case "$1" in
+    KIRBY_URL)            echo "GRAV_CONFIG__system__custom_base_url" ;;
+    KIRBY_CONTENT_SALT|KIRBY_COOKIE_KEY)
+                          echo "entfällt – neue Schlüssel GRAV_NONCE_KEY und GRAV_API_JWT_SECRET (optional)" ;;
+    KIRBY_DEBUG)          echo "GRAV_ENVIRONMENT=dev (nur lokal)" ;;
+    KIRBY_NOINDEX)        echo "KNEIPE_NOINDEX" ;;
+    KIRBY_TIMEZONE)       echo "PHP_TIMEZONE" ;;
+    KIRBY_MAIL_TRANSPORT) echo "GRAV_CONFIG__plugins__email__mailer__engine" ;;
+    KIRBY_SMTP_HOST)      echo "GRAV_CONFIG__plugins__email__mailer__smtp__server" ;;
+    KIRBY_SMTP_PORT)      echo "GRAV_CONFIG__plugins__email__mailer__smtp__port" ;;
+    KIRBY_SMTP_SECURITY)  echo "GRAV_CONFIG__plugins__email__mailer__smtp__encryption" ;;
+    KIRBY_SMTP_USER)      echo "GRAV_CONFIG__plugins__email__mailer__smtp__user" ;;
+    KIRBY_SMTP_PASSWORD)  echo "GRAV_CONFIG__plugins__email__mailer__smtp__password" ;;
+    KIRBY_MAIL_FROM)      echo "GRAV_CONFIG__plugins__email__from" ;;
+    KIRBY_MAIL_FROM_NAME) echo "GRAV_CONFIG__plugins__email__from_name" ;;
+    KIRBY_NEW_PASSWORD)   echo "entfällt – Erstkonto über KNEIPE_ADMIN_USERNAME, KNEIPE_ADMIN_EMAIL, KNEIPE_ADMIN_PASSWORD" ;;
+    KIRBY_CONTENT_ROOT|KIRBY_MEDIA_ROOT|KIRBY_STORAGE_ROOT|KIRBY_ENV_FILE)
+                          echo "entfällt – alle Daten liegen unter GRAV_DATA_DIR (/data)" ;;
+    *)                    echo "entfällt" ;;
+  esac
+}
+
+mapfile -t kirby_vars < <(compgen -e | grep '^KIRBY_' || true)
+if (( ${#kirby_vars[@]} )); then
+  log "WARNUNG: Dies ist die Grav-Fassung – Variablen der Kirby-Fassung werden ignoriert:"
+  for var in "${kirby_vars[@]}"; do
+    log "  $var → $(kirby_replacement "$var")"
+  done
+fi
+
 case "$GRAV_ENVIRONMENT" in
   dev|staging|production) ;;
   *) fail "GRAV_ENVIRONMENT muss dev, staging oder production sein (ist: $GRAV_ENVIRONMENT)." ;;
@@ -103,6 +137,11 @@ rm -rf "${GRAV_CACHE_PATH:?}"/* 2>/dev/null || true
 cd "$GRAV_ROOT_DIR"
 
 if [[ -z "$(find "$GRAV_DATA_DIR/accounts" -maxdepth 1 -name '*.yaml' -print -quit 2>/dev/null)" ]]; then
+  # Die Kirby-Fassung meldete mit der E-Mail-Adresse an; Grav braucht einen
+  # Benutzernamen. Ohne Angabe heißt das erste Konto „admin“.
+  if [[ -z "${KNEIPE_ADMIN_USERNAME:-}" && -n "${KNEIPE_ADMIN_PASSWORD:-}" && -n "${KNEIPE_ADMIN_EMAIL:-}" ]]; then
+    KNEIPE_ADMIN_USERNAME="admin"
+  fi
   if [[ -n "${KNEIPE_ADMIN_USERNAME:-}" && -n "${KNEIPE_ADMIN_PASSWORD:-}" && -n "${KNEIPE_ADMIN_EMAIL:-}" ]]; then
     printf '%s' "$KNEIPE_ADMIN_PASSWORD" | php bin/plugin kneipe user \
       --username="$KNEIPE_ADMIN_USERNAME" --email="$KNEIPE_ADMIN_EMAIL" \
