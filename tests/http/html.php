@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__DIR__) . '/support/http.php';
-
 /**
  * HTML-Grundvalidität und Barrierefreiheit (automatisch prüfbarer Teil):
  * Doctype, lang, Titel, Beschreibung, genau eine H1, keine übersprungenen

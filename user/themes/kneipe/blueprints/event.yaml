@@ -1,0 +1,226 @@
+# Admin2-Formular für Seiten mit Template „event“ (Theme kneipe).
+title: Termin
+
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        termin:
+          type: tab
+          title: Termin
+          fields:
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              help: 'Bei freien Terminen darf der Titel leer bleiben.'
+            info_workflow:
+              type: display
+              markdown: true
+              content: '**Öffentlich** erscheint ein Termin nur, wenn er veröffentlicht ist (Reiter „Veröffentlichung“) und einen öffentlichen Status hat. Im Freigabemodus setzt die Moderation den Status auf **zur Freigabe**; bestätigen und veröffentlichen darf nur die Administration. Doppelbelegungen blockieren das Veröffentlichen.'
+            header.category:
+              type: select
+              label: Terminart
+              default: kneipenabend
+              options:
+                kneipenabend: Regulärer Kneipenabend
+                thekenteam: Thekenteam
+                sonder: Sonderveranstaltung
+                senioren: Seniorennachmittag
+                kultur: Kultur oder Musik
+                privat: 'Private oder interne Veranstaltung'
+                geschlossen: Geschlossen
+            header.orgstatus:
+              type: select
+              label: Organisatorischer Status
+              default: frei
+              help: 'angefragt, reserviert und zur Freigabe sind intern und erscheinen nie öffentlich.'
+              options:
+                frei: frei
+                angefragt: angefragt
+                reserviert: reserviert
+                freigabe: zur Freigabe
+                bestaetigt: bestätigt
+                veroeffentlicht: veröffentlicht
+                abgesagt: abgesagt
+                geschlossen: geschlossen
+                archiviert: archiviert
+            header.start:
+              type: datetime
+              label: Beginn
+              format: 'Y-m-d H:i'
+              validate:
+                required: true
+            header.end:
+              type: datetime
+              label: Ende
+              format: 'Y-m-d H:i'
+              help: 'Ohne Ende rechnet der Kalender mit 4 Stunden.'
+            header.allday:
+              type: toggle
+              label: Ganztägig
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.doors:
+              type: text
+              label: Einlass (Uhrzeit)
+              placeholder: '18:30'
+              validate:
+                pattern: '^([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
+            header.team:
+              type: pages
+              label: Thekenteam
+              start_route: /thekenteams
+              show_root: false
+              show_all: false
+              show_modular: false
+              help: 'Erscheint nur, wenn das Team veröffentlicht ist und eingewilligt hat.'
+            header.teaser:
+              type: textarea
+              label: Kurzbeschreibung
+              rows: 3
+              validate:
+                max: 400
+            header.location:
+              type: text
+              label: Ort (leer = Kneipe)
+            header.address:
+              type: textarea
+              label: Adresse (leer = Adresse der Kneipe)
+              rows: 2
+            header.audience:
+              type: text
+              label: Für wen?
+            header.admission:
+              type: text
+              label: Eintritt
+            header.publiccontact:
+              type: text
+              label: Öffentlicher Kontakt
+            content:
+              type: markdown
+              label: Ausführliche Beschreibung
+              validate:
+                type: textarea
+                max: 0
+            header.cover:
+              type: filepicker
+              label: Titelbild
+              folder: '@self'
+              preview_images: true
+              accept: ['.jpg', '.jpeg', '.png', '.webp']
+            header.gallery:
+              type: list
+              label: Bildergalerie
+              style: vertical
+              fields:
+                .image:
+                  type: filepicker
+                  label: Bild
+                  folder: '@self'
+                  preview_images: true
+                  accept: ['.jpg', '.jpeg', '.png', '.webp']
+            header.media_order:
+              type: pagemedia
+              label: Bilder hochladen
+            header.seotitle:
+              type: text
+              label: Titel für Suchmaschinen (optional)
+            header.seodescription:
+              type: textarea
+              label: Beschreibung für Suchmaschinen (optional)
+              rows: 2
+        intern:
+          type: tab
+          title: Intern
+          fields:
+            info_intern:
+              type: display
+              markdown: true
+              content: 'Diese Angaben erscheinen **nie** auf der Website.'
+            header.responsible:
+              type: text
+              label: Verantwortliche Person
+            header.internalnote:
+              type: textarea
+              label: Interne Notiz
+              rows: 4
+            header.conflictaccepted:
+              type: toggle
+              label: Überschneidung ausdrücklich zulassen
+              help: 'Nur die Administration. Erst dann lässt sich ein Termin mit Doppelbelegung bestätigen.'
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.changenote:
+              type: text
+              label: Notiz zu dieser Änderung (fürs Protokoll)
+            header.createdby:
+              type: text
+              label: Angelegt von
+              readonly: true
+            header.createdat:
+              type: text
+              label: Angelegt am
+              readonly: true
+            header.modifiedby:
+              type: text
+              label: Zuletzt geändert von
+              readonly: true
+            header.modifiedat:
+              type: text
+              label: Zuletzt geändert am
+              readonly: true
+            header.changelog:
+              type: list
+              label: Änderungsprotokoll (automatisch)
+              readonly: true
+              controls: none
+              fields:
+                .date:
+                  type: text
+                  label: Zeitpunkt
+                  readonly: true
+                .user:
+                  type: text
+                  label: Von
+                  readonly: true
+                .changes:
+                  type: text
+                  label: Änderung
+                  readonly: true
+                .note:
+                  type: text
+                  label: Notiz
+                  readonly: true
+                .status:
+                  type: text
+                  label: Stand
+                  readonly: true
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              help: 'Im Freigabemodus veröffentlicht nur die Administration.'
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

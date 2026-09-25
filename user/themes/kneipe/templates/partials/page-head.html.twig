@@ -1,0 +1,19 @@
+{#
+  Seitenkopf mit der einzigen H1 der Seite.
+  Variablen: title, intro (Text), eyebrow, back {url, text}; Block slot
+#}
+<header class="page-head">
+  <div class="container">
+    {% if back is defined and back %}
+    <p class="page-head__back"><a href="{{ back.url }}">{{ icon('back') }}{{ back.text }}</a></p>
+    {% endif %}
+    {% if eyebrow is defined and eyebrow %}
+    <p class="eyebrow">{{ eyebrow }}</p>
+    {% endif %}
+    <h1>{{ title }}</h1>
+    {% if intro is defined and intro %}
+    <p class="lead">{{ ktext(intro) }}</p>
+    {% endif %}
+    {% block slot %}{% endblock %}
+  </div>
+</header>

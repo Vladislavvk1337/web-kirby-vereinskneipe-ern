@@ -1,0 +1,206 @@
+# Grundkonfiguration für alle Umgebungen. Abweichungen je Umgebung stehen in
+# user/env/<GRAV_ENVIRONMENT>/config/system.yaml, einzelne Werte lassen sich
+# über GRAV_CONFIG__system__<schlüssel> setzen (Docker.md).
+absolute_urls: false
+timezone: Europe/Berlin
+default_locale: de
+param_sep: ':'
+wrapped_site: false
+reverse_proxy_setup: false
+force_ssl: false
+# Öffentliche Basis-URL, z. B. https://www.example.org – im Container über
+# GRAV_CONFIG__system__custom_base_url
+custom_base_url: ''
+
+# Die Client-IP setzt Apache (mod_remoteip) aus X-Forwarded-For vertrauens-
+# würdiger Proxys. Grav selbst wertet keine Weiterleitungs-Header aus.
+http_x_forwarded:
+  protocol: false
+  host: false
+  port: false
+  ip: false
+  client_ip: false
+  cf_connecting_ip: false
+
+languages:
+  supported: []
+  translations: true
+
+home:
+  alias: '/home'
+  hide_in_urls: false
+
+pages:
+  theme: kneipe
+  order:
+    by: default
+    dir: asc
+  list:
+    count: 20
+  dateformat:
+    default: 'd.m.Y H:i'
+    short: 'd.m.Y'
+    long: 'j. F Y, H:i'
+  publish_dates: true
+  process:
+    markdown: true
+    twig: false
+  twig_first: false
+  never_cache_twig: false
+  events:
+    page: true
+    twig: true
+  markdown:
+    extra: false
+    auto_line_breaks: false
+    auto_url_links: false
+    escape_markup: true
+    special_chars:
+      '>': 'gt'
+      '<': 'lt'
+    valid_link_attributes: ['rel', 'target', 'id', 'class', 'classes']
+  types: [html, ics, xml, txt]
+  markdown_output:
+    enabled: false
+  expires: 0
+  cache_control: 'no-cache'
+  last_modified: false
+  etag: true
+  vary_accept_encoding: false
+  redirect_default_code: 302
+  redirect_trailing_slash: 1
+  redirect_default_route: 0
+  ignore_files: [.DS_Store, .gitkeep]
+  ignore_folders: [.git, .idea]
+  ignore_hidden: true
+  hide_empty_folders: false
+  url_taxonomy_filters: false
+  frontmatter:
+    process_twig: false
+    ignore_fields: ['form', 'forms']
+
+cache:
+  enabled: true
+  check:
+    method: file
+  driver: file
+  prefix: 'k'
+  purge_at: '0 4 * * *'
+  clear_at: '0 3 * * *'
+  clear_job_type: 'standard'
+  clear_images_by_default: false
+  cli_compatibility: true
+  lifetime: 604800
+  gzip: false
+  allow_webserver_gzip: false
+
+twig:
+  cache: true
+  debug: false
+  auto_reload: false
+  autoescape: true
+  umask_fix: false
+
+assets:
+  css_pipeline: false
+  js_pipeline: false
+  enable_asset_timestamp: true
+  enable_asset_sri: false
+
+errors:
+  display: 0
+  log: true
+
+log:
+  handler: file
+
+debugger:
+  enabled: false
+  provider: clockwork
+  censored: true
+  shutdown:
+    close_connection: true
+
+images:
+  adapter: gd
+  default_image_quality: 82
+  progressive_jpeg: true
+  cache_all: false
+  cache_perms: '0775'
+  debug: false
+  auto_fix_orientation: true
+  seofriendly: false
+  url_actions: false
+  cls:
+    auto_sizes: true
+    aspect_ratio: false
+    retina_scale: 1
+  defaults:
+    loading: lazy
+    decoding: async
+    fetchpriority: auto
+
+media:
+  enable_media_timestamp: false
+  unsupported_inline_types: []
+  allowed_fallback_types: []
+  auto_metadata_exif: false
+
+# Datenschutz: Die Sitzung startet erst, wenn sie gebraucht wird (Formular,
+# Anmeldung). Reine Seitenaufrufe setzen kein Cookie.
+session:
+  enabled: true
+  initialize: true
+  lazy: true
+  read_and_close: false
+  timeout: 1800
+  name: kneipe
+  uniqueness: path
+  secure: false
+  secure_https: true
+  httponly: true
+  samesite: Lax
+  split: true
+  domain:
+  path:
+
+# Keine Paketinstallation zur Laufzeit – Plugins kommen mit dem Image.
+gpm:
+  releases: stable
+  official_gpm_only: true
+
+updates:
+  safe_upgrade: false
+
+http:
+  method: auto
+  enable_proxy: true
+  proxy_url:
+  proxy_cert_path:
+  concurrent_connections: 5
+  verify_peer: true
+  verify_host: true
+
+# Avatare lokal erzeugen statt über gravatar.com (keine externen Anfragen)
+accounts:
+  type: regular
+  storage: file
+  avatar: multiavatar
+
+flex:
+  cache:
+    index:
+      enabled: true
+      lifetime: 60
+    object:
+      enabled: true
+      lifetime: 600
+    render:
+      enabled: true
+      lifetime: 600
+
+strict_mode:
+  yaml_compat: false
+  twig2_compat: false
+  twig3_compat: false
+  blueprint_compat: false

@@ -1,8 +1,0 @@
-title: Administration
-description: Alle Inhalte, Veröffentlichung, Anfragen, Benutzer und Einstellungen
-# Die Rolle „admin“ hat in Kirby immer alle Rechte.
-fields:
-  phoneinternal:
-    label: Telefon (intern)
-    type: tel
-    help: Nur für Rückfragen innerhalb der Redaktion.

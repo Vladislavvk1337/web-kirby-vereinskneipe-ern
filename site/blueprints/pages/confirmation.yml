@@ -1,9 +1,0 @@
-title: Bestätigungsseite
-icon: check
-extends: options/admin-only
-
-fields:
-  text:
-    label: Text nach dem Absenden
-    type: textarea
-    buttons: false

@@ -1,0 +1,8 @@
+# Plugin „kneipe“: Terminlogik, Freigabe, Anfrageformular, iCalendar,
+# Sitemap, robots.txt, Health-Checks. Werte lassen sich über Umgebungs-
+# variablen überschreiben (KNEIPE_*, siehe Docker.md).
+enabled: true
+requests:
+  rate_limit: 5        # vollständige Anfragen je IP und Stunde
+  min_seconds: 3       # Zeitfalle: frühestens nach … Sekunden absenden
+noindex: false         # Suchmaschinen aussperren (Staging)

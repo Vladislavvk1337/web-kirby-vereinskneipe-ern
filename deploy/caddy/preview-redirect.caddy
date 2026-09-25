@@ -1,8 +1,0 @@
-# --------------------------------------------------------------------------
-# Phase „live“: alte Vorschau-Adresse auf die Hauptadresse umleiten.
-# Wird nur angehängt, wenn PREVIEW_HOST gesetzt ist. Soll die Vorschau
-# weiterlaufen, diesen Block durch den Inhalt von preview.caddy ersetzen.
-# --------------------------------------------------------------------------
-{{PREVIEW_HOST}} {
-	redir https://{{LIVE_HOST}}{uri} permanent
-}

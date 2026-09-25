@@ -1,0 +1,31 @@
+{#
+  Formularfeld mit Label, Hinweis und Fehlermeldung direkt am Feld.
+  Variablen: name, label, type (text|email|tel|date|textarea|select),
+  required, hint, values, errors, options (select), autocomplete,
+  maxlength, rows, inputmode, min
+#}
+{% set type = type ?? 'text' %}
+{% set required = required ?? false %}
+{% set hint = hint ?? null %}
+{% set id = 'feld-' ~ name %}
+{% set value = values[name] ?? '' %}
+{% set error = errors[name] ?? null %}
+{% set describe = [hint ? id ~ '-hinweis' : null, error ? id ~ '-fehler' : null]|filter(v => v) %}
+{% set common %} id="{{ id }}" name="{{ name }}"{% if required %} required{% endif %}{% if error %} aria-invalid="true"{% endif %}{% if describe|length %} aria-describedby="{{ describe|join(' ') }}"{% endif %}{% if autocomplete ?? false %} autocomplete="{{ autocomplete }}"{% endif %}{% if maxlength ?? false %} maxlength="{{ maxlength }}"{% endif %}{% endset %}
+<div class="field{{ error ? ' field--error' : '' }}">
+  <label for="{{ id }}">{{ label }}{% if not required %} <span class="field__optional">(freiwillig)</span>{% endif %}</label>
+  {% if hint %}<p class="field__hint" id="{{ id }}-hinweis">{{ hint }}</p>{% endif %}
+  {% if error %}<p class="field__error" id="{{ id }}-fehler">{{ icon('alert') }}<span><span class="visually-hidden">Fehler: </span>{{ error }}</span></p>{% endif %}
+  {% if type == 'textarea' %}
+  <textarea{{ common }} rows="{{ rows ?? 5 }}">{{ value }}</textarea>
+  {% elseif type == 'select' %}
+  <select{{ common }}>
+    <option value="">Bitte auswählen</option>
+    {% for key, option_label in options %}
+    <option value="{{ key }}"{% if value == key %} selected{% endif %}>{{ option_label }}</option>
+    {% endfor %}
+  </select>
+  {% else %}
+  <input{{ common }} type="{{ type }}" value="{{ value }}"{% if inputmode ?? false %} inputmode="{{ inputmode }}"{% endif %}{% if min ?? false %} min="{{ min }}"{% endif %}>
+  {% endif %}
+</div>

@@ -1,0 +1,4 @@
+# Wird nur als Abhängigkeit des Login-Plugins gebraucht – in Inhalten aus.
+enabled: true
+active: false
+active_admin: false

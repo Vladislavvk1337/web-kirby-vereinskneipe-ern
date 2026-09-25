@@ -1,0 +1,19 @@
+# Technische Grundangaben. Stammdaten (Adresse, Kontakt, Öffnungszeiten)
+# und Einstellungen pflegt die Administration im Admin auf der Seite
+# „Einstellungen“ (user/pages/einstellungen) – nicht hier.
+title: 'Ehrenamtskneipe Erndtebrück'
+default_lang: de
+author:
+  name: 'Ehrenamtskneipe Erndtebrück'
+  email: ''
+taxonomies: []
+metadata: {}
+summary:
+  enabled: true
+  format: short
+  size: 300
+  delimiter: '==='
+redirects: {}
+routes: {}
+blog:
+  route: ''

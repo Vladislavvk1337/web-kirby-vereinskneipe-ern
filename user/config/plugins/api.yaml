@@ -1,0 +1,26 @@
+# Die JWT- und Nonce-Geheimnisse liegen in $GRAV_DATA_DIR/config/…-private.php
+# (setup.php). Im Cluster können sie aus einem Secret kommen (Docker.md).
+enabled: true
+route: /api
+version_prefix: v1
+auth:
+  api_keys_enabled: false
+  jwt_enabled: true
+  jwt_algorithm: HS256
+  jwt_expiry: 3600
+  jwt_refresh_expiry: 86400
+  session_enabled: true
+cors:
+  enabled: true
+  origins: []
+  credentials: false
+rate_limit:
+  enabled: true
+  requests: 120
+  window: 60
+  storage: file
+allow_draft_preview: true
+preview_token_ttl: 300
+# Keine Besucherstatistik – keine personenbezogenen Nutzungsdaten sammeln
+popularity:
+  enabled: false

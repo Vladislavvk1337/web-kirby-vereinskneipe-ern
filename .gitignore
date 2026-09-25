@@ -1,28 +1,23 @@
-# Abhängigkeiten (composer install)
-/kirby/
-/vendor/
+# Grav-Kern und Laufzeitdaten der lokalen Entwicklung (scripts/dev-server.sh)
+/.grav/
 
-# Laufzeitdaten – nie ins Repository
-/media/*
-!/media/index.html
-/site/accounts/*
-!/site/accounts/index.html
-/site/sessions/
-/site/cache/
-/site/logs/
-/site/config/.license
-/storage/
+# Laufzeitdaten – gehören nach $GRAV_DATA_DIR, nie ins Repository
+/user/accounts/
+/user/pages/
+/user/data/
+/user/media/
 
-# Personenbezogene Daten: Anfragen aus dem Formular
-/content/anfragen/_drafts/
-# Kirby-Änderungsstände (Panel-Entwürfe) und Sperrdateien
-/content/**/_changes/
-.lock
+# Von Grav erzeugt (Image: beim Build)
+/user/config/versions.yaml
+/user/config/security-private.php
+/user/config/plugins/api-private.php
 
 # Geheimnisse
 .env
 .env.*
 !.env.example
+/k8s/**/secret.yaml
+/k8s/**/*.secret.yaml
 
 # Tests und Werkzeuge
 /tests/tmp/

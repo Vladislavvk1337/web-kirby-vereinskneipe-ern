@@ -1,0 +1,68 @@
+{# Fußbereich: Adresse, Öffnungszeiten, Kontakt, Service- und Rechtslinks #}
+{% set hours = kneipe.settingRows('openinghours') %}
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <section class="site-footer__brand" aria-labelledby="footer-name">
+      <p class="site-footer__logo" id="footer-name">{% include 'partials/logo-mark.html.twig' %}<span>{{ kneipe.name }}</span></p>
+      <p class="site-footer__claim">{{ kneipe.claim }}</p>
+    </section>
+
+    <section aria-labelledby="footer-adresse">
+      <h2 id="footer-adresse">Adresse</h2>
+      <address>
+        {% if kneipe.setting('venue') %}{{ kneipe.setting('venue') }}<br>{% endif %}
+        {% if kneipe.setting('street') %}{{ kneipe.setting('street') }}{% else %}<mark class="placeholder">[Straße und Hausnummer]</mark>{% endif %}<br>
+        {% if kneipe.setting('postalcode') %}{{ kneipe.setting('postalcode') }}{% else %}<mark class="placeholder">[PLZ]</mark>{% endif %}
+        {{ kneipe.setting('city', 'Erndtebrück') }}
+      </address>
+      {% if kneipe.mapUrl %}
+      <p><a class="link-external" href="{{ kneipe.mapUrl }}" rel="noopener">Auf der Karte ansehen{{ icon('external') }}<span class="visually-hidden"> (OpenStreetMap, externe Website)</span></a></p>
+      {% endif %}
+    </section>
+
+    <section aria-labelledby="footer-zeiten">
+      <h2 id="footer-zeiten">Öffnungszeiten</h2>
+      {% if hours|length %}
+      <dl class="hours">
+        {% for row in hours %}
+        <div><dt>{{ ktext(row.days) }}</dt><dd>{{ ktext(row.time) }}{% if row.note %} <span class="hours__note">{{ ktext(row.note) }}</span>{% endif %}</dd></div>
+        {% endfor %}
+      </dl>
+      {% endif %}
+      {% if kneipe.setting('openingnote') %}<p>{{ ktext(kneipe.setting('openingnote')) }}</p>{% endif %}
+      <p><a href="{{ kneipe.url('/termine') }}">Alle Termine im Kalender</a></p>
+    </section>
+
+    <section aria-labelledby="footer-kontakt">
+      <h2 id="footer-kontakt">Kontakt</h2>
+      <ul class="plain-list">
+        <li>{% include 'partials/email.html.twig' with {icon_before: true} %}</li>
+        <li>{% include 'partials/phone.html.twig' with {icon_before: true} %}</li>
+      </ul>
+      {% set social = kneipe.settingRows('social') %}
+      {% if social|length %}
+      <ul class="plain-list">
+        {% for link in social %}
+        {% if link.url starts with 'https://' or link.url starts with 'http://' %}
+        <li><a href="{{ link.url }}" rel="noopener">{{ link.platform ?: 'Profil' }}</a></li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="container site-footer__bottom">
+    <nav aria-label="Service und Rechtliches">
+      <ul class="inline-list">
+        <li><a href="{{ kneipe.url('/aktuelles') }}">Aktuelles</a></li>
+        <li><a href="{{ kneipe.url('/termin-anfragen') }}">Termin anfragen</a></li>
+        <li><a href="{{ kneipe.url('/termine.ics') }}">Kalender abonnieren</a></li>
+        <li><a href="{{ kneipe.url('/impressum') }}">Impressum</a></li>
+        <li><a href="{{ kneipe.url('/datenschutz') }}">Datenschutz</a></li>
+        <li><a href="{{ kneipe.url('/barrierefreiheit') }}">Barrierefreiheit</a></li>
+      </ul>
+    </nav>
+    <p>© {{ 'now'|date('Y') }} {{ kneipe.name }} · ehrenamtlich betrieben</p>
+  </div>
+</footer>

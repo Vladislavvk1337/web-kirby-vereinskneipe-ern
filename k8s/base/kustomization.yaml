@@ -1,0 +1,32 @@
+# Basis für alle Umgebungen – nicht direkt anwenden, sondern ein Overlay:
+#   kubectl apply -k k8s/overlays/production
+#
+# Liegt unter k8s/base/ (nicht direkt in k8s/), weil Kustomize keine
+# Overlays unterhalb der Basis erlaubt (Zykluserkennung).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kneipe
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: kneipe-web
+      app.kubernetes.io/part-of: ehrenamtskneipe
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/managed-by: kustomize
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - network-policy.yaml
+  # secret.example.yaml ist nur eine Vorlage – Secret separat anlegen
+
+images:
+  - name: ghcr.io/vladislavvk1337/web-kirby-vereinskneipe-ern
+    newTag: latest

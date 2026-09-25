@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__DIR__) . '/support/http.php';
-
 $public = [
 	'/', '/termine', '/termine?jahr=2026&monat=10', '/termine?art=kultur&verfuegbarkeit=bestaetigt',
 	'/termine?zeitraum=vergangen', '/termine/kneipenabend-mit-dem-beispiel-thekenteam',
@@ -75,7 +73,7 @@ test('robots.txt und XML-Sitemap', function () {
 	$http   = new HttpClient();
 	$robots = $http->get('/robots.txt')['body'];
 	assert_contains('Sitemap:', $robots);
-	assert_contains('Disallow: /panel', $robots);
+	assert_contains('Disallow: /admin', $robots);
 
 	$sitemap = $http->get('/sitemap.xml')['body'];
 	assert_true(simplexml_load_string($sitemap) !== false, 'gültiges XML');
@@ -92,7 +90,7 @@ test('nur das Anfrageformular setzt ein (technisch notwendiges) Cookie', functio
 	}
 
 	$form = (new HttpClient())->get('/termin-anfragen');
-	assert_contains('kirby_session', implode(' ', $form['headers']['set-cookie'] ?? []));
+	assert_contains('kneipe', implode(' ', $form['headers']['set-cookie'] ?? []));
 	assert_contains('HttpOnly', implode(' ', $form['headers']['set-cookie']));
 });
 

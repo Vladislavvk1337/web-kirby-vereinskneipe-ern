@@ -1,10 +1,10 @@
 <?php
 
-use Kneipe\FormTimer;
-use Kneipe\RateLimiter;
-use Kneipe\RequestValidator;
-use Kneipe\Richtext;
-use Kneipe\Changelog;
+use Grav\Plugin\Kneipe\FormTimer;
+use Grav\Plugin\Kneipe\RateLimiter;
+use Grav\Plugin\Kneipe\RequestValidator;
+use Grav\Plugin\Kneipe\Richtext;
+use Grav\Plugin\Kneipe\Changelog;
 
 $valid = [
 	'slot'        => 'termin-16-10',

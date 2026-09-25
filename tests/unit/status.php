@@ -1,8 +1,8 @@
 <?php
 
-use Kneipe\EventStatus;
-use Kneipe\Overlap;
-use Kneipe\Workflow;
+use Grav\Plugin\Kneipe\EventStatus;
+use Grav\Plugin\Kneipe\Overlap;
+use Grav\Plugin\Kneipe\Workflow;
 
 test('interne Status sind nie öffentlich', function () {
 	foreach (['angefragt', 'reserviert', 'freigabe'] as $status) {

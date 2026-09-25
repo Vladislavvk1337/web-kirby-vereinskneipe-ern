@@ -1,0 +1,98 @@
+{#
+  Termin-Detailseite. Gibt nur öffentliche Angaben aus – interne Notiz,
+  verantwortliche Person, Protokoll und Überschneidungsdaten nie.
+#}
+{% extends 'partials/base.html.twig' %}
+{% set event = kneipe.event(page) %}
+{% set preview = not event.isPublic %}
+{% set meta_title = event.metaTitle %}
+{% set meta_description = event.metaDescription %}
+{% set jsonld = event.jsonLd ? [event.jsonLd] : [] %}
+
+{% block content %}
+{% set start = event.startTimestamp %}
+{% set private = event.isPrivateEvent %}
+{% set team = event.publicTeam %}
+{% set cover = event.cover %}
+<article class="event-detail">
+  {% embed 'partials/page-head.html.twig' with {
+    title: event.publicTitle,
+    eyebrow: private ? null : event.eventTypeLabel,
+    back: {url: kneipe.url('/termine'), text: 'Alle Termine'}
+  } %}
+    {% block slot %}<p class="event-detail__status">{% include 'partials/status.html.twig' with {event: event} %}</p>{% endblock %}
+  {% endembed %}
+
+  <div class="container event-detail__grid">
+    {# Fakten zuerst: auf dem Handy stehen Datum und Uhrzeit oben #}
+    <aside class="event-detail__facts" aria-labelledby="fakten-titel">
+      <h2 id="fakten-titel" class="visually-hidden">Das Wichtigste auf einen Blick</h2>
+      <dl class="fact-list">
+        {% if start %}
+        <div><dt>{{ icon('calendar') }}Datum</dt><dd><time datetime="{{ start|date(event.isAllDay ? 'Y-m-d' : 'c') }}">{{ kneipe.formatDate(start) }}</time></dd></div>
+        <div><dt>{{ icon('clock') }}Uhrzeit</dt><dd>{{ kneipe.timeRange(event) }}</dd></div>
+        {% endif %}
+        {% if event.doorsTimestamp %}
+        <div><dt>{{ icon('door') }}Einlass</dt><dd>{{ event.doorsTimestamp|date('H:i') }} Uhr</dd></div>
+        {% endif %}
+        <div><dt>{{ icon('pin') }}Ort</dt><dd>
+          {% if event.locationName %}{{ event.locationName }}<br>{% endif %}
+          {% if event.locationAddress %}{{ ktext(event.locationAddress) }}{% else %}<mark class="placeholder">[Adresse folgt]</mark>{% endif %}
+          {% if kneipe.mapUrl %}<br><a class="link-external" href="{{ kneipe.mapUrl }}" rel="noopener">Karte{{ icon('external') }}<span class="visually-hidden"> (OpenStreetMap, externe Website)</span></a>{% endif %}
+        </dd></div>
+        {% if team %}
+        <div><dt>{{ icon('users') }}Thekenteam</dt><dd><a href="{{ team.url }}">{{ team.title }}</a></dd></div>
+        {% endif %}
+        {% if event.publicField('audience') %}
+        <div><dt>{{ icon('users') }}Für wen?</dt><dd>{{ ktext(event.publicField('audience')) }}</dd></div>
+        {% endif %}
+        {% if event.publicField('admission') %}
+        <div><dt>{{ icon('ticket') }}Eintritt</dt><dd>{{ ktext(event.publicField('admission')) }}</dd></div>
+        {% endif %}
+        {% if event.publicField('publiccontact') %}
+        <div><dt>{{ icon('mail') }}Kontakt</dt><dd>{{ ktext(event.publicField('publiccontact')) }}</dd></div>
+        {% endif %}
+      </dl>
+      {% if event.hasIcs and not event.isPast %}
+      <p><a class="button button--secondary button--block" href="{{ event.url }}.ics" download>{{ icon('download') }}In den eigenen Kalender eintragen</a></p>
+      {% endif %}
+    </aside>
+
+    <div class="event-detail__main">
+      {% if event.isCancelled %}
+      <div class="notice notice--danger" role="note">{{ icon('cancel') }}<p><strong>Diese Veranstaltung ist abgesagt.</strong> Bitte kommt an diesem Termin nicht vorbei.</p></div>
+      {% elseif event.isPast %}
+      <div class="notice" role="note">{{ icon('info') }}<p>Dieser Termin liegt in der Vergangenheit.</p></div>
+      {% endif %}
+
+      {% if event.isFree and not event.isPast %}
+      <div class="free-callout">
+        <h2>Dieser Termin ist noch frei.</h2>
+        <p>Eure Gruppe möchte an diesem Abend hinter der Theke stehen? Fragt den Termin unverbindlich an.</p>
+        <p><a class="button button--primary" href="{{ kneipe.url('/termin-anfragen') }}?termin={{ event.slug|url_encode }}">Diesen Termin anfragen{{ icon('arrow') }}</a></p>
+      </div>
+      {% endif %}
+
+      {% if cover %}
+      <figure class="event-detail__cover">
+        {% include 'partials/image.html.twig' with {image: cover, ratio: 1.5, lazy: false, sizes: '(min-width: 64em) 60vw, 100vw'} %}
+        {% set caption = kneipe.imageMeta(cover, 'caption') %}
+        {% set credit = kneipe.imageMeta(cover, 'credit') %}
+        {% if caption or credit %}
+        <figcaption>{{ ktext((caption ~ (credit ? ' · ' ~ credit : ''))|trim) }}</figcaption>
+        {% endif %}
+      </figure>
+      {% endif %}
+
+      {% if event.publicTeaser %}
+      <p class="lead">{{ ktext(event.publicTeaser) }}</p>
+      {% endif %}
+
+      {% set text = event.textHtml %}
+      {% if text %}<div class="prose">{{ safe_html(text) }}</div>{% endif %}
+
+      {% include 'partials/gallery.html.twig' with {images: event.gallery, heading_id: 'galerie-titel'} %}
+    </div>
+  </div>
+</article>
+{% endblock %}

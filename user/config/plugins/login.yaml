@@ -1,0 +1,17 @@
+enabled: true
+built_in_css: false
+redirect_to_login: false
+# Links in E-Mails (Passwort zurücksetzen) nur mit bekannter Basis-URL
+require_trusted_host: true
+route: '/login'
+twofa_enabled: true
+rememberme:
+  enabled: false
+max_pw_resets_count: 2
+max_pw_resets_interval: 60
+max_login_count: 5
+max_login_interval: 10
+magic_link:
+  enabled: false
+user_registration:
+  enabled: false

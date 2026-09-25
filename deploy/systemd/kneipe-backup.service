@@ -1,8 +1,0 @@
-# Installiert von deploy/server-setup.sh nach /etc/systemd/system/
-[Unit]
-Description=Inhalte, Konten und Konfiguration der Kirby-Website sichern
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/kneipe-backup
-Nice=10

@@ -1,0 +1,14 @@
+# Persistente Daten: Seiten mit Bildern, Konten, Anfragen, Laufzeit-
+# schlüssel (/data). ReadWriteOnce – deshalb genau ein Pod (Docker.md,
+# „Skalierung“). storageClassName bleibt leer = Standard-StorageClass
+# des Clusters (ANNAHME); im Overlay bei Bedarf setzen.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kneipe-web-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

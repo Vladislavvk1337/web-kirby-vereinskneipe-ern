@@ -1,0 +1,9 @@
+{# Datumskachel für Listen. Variable: event #}
+{% set start = event.startTimestamp %}
+{% if start %}
+<time class="date-tile" datetime="{{ start|date('c') }}">
+  <span class="date-tile__weekday">{{ kneipe.formatDate(start, 'EEE') }}</span>
+  <span class="date-tile__day">{{ start|date('j') }}</span>
+  <span class="date-tile__month">{{ kneipe.formatDate(start, 'MMM') }}</span>
+</time>
+{% endif %}

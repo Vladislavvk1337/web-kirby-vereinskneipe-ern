@@ -1,7 +1,5 @@
 <?php
 
-require_once dirname(__DIR__) . '/support/http.php';
-
 $valid = fn () => [
 	'slot' => 'anderer', 'wishdate' => date('Y-m-d', strtotime('+30 days')), 'altdate' => '',
 	'groupname' => 'HTTP-Testgruppe', 'grouptype' => 'initiative', 'contactname' => 'Test Person',
@@ -19,14 +17,14 @@ test('Formular enthält CSRF-Token, Zeitfalle und Honeypot', function () {
 });
 
 test('ohne gültiges CSRF-Token wird nichts gespeichert', function () use ($valid) {
-	$before = count(request_drafts());
+	$before = count(stored_requests());
 	$http = new HttpClient();
 	$http->get('/termin-anfragen');
 	$response = $http->post('/termin-anfragen', [...$valid(), 'csrf' => 'falsch', 'formstart' => '1']);
 	assert_same(422, $response['status']);
 	assert_contains('Sitzung ist abgelaufen', $response['body']);
 	assert_contains('value="HTTP-Testgruppe"', $response['body'], 'Eingaben bleiben erhalten');
-	assert_same($before, count(request_drafts()));
+	assert_same($before, count(stored_requests()));
 
 	// Token als Array führt nicht zu einem Serverfehler
 	assert_same(422, $http->post('/termin-anfragen', [...$valid(), 'csrf' => ['x'], 'groupname' => ['y']])['status']);
@@ -34,7 +32,7 @@ test('ohne gültiges CSRF-Token wird nichts gespeichert', function () use ($vali
 	// ohne Sitzung (fremde Seite schickt das Formular ab)
 	$foreign = (new HttpClient())->post('/termin-anfragen', [...$valid(), 'csrf' => $hidden['csrf'] ?? 'x']);
 	assert_same(422, $foreign['status']);
-	assert_same($before, count(request_drafts()));
+	assert_same($before, count(stored_requests()));
 });
 
 test('Anfrage von fremder Herkunft wird abgelehnt', function () use ($valid) {
@@ -45,21 +43,21 @@ test('Anfrage von fremder Herkunft wird abgelehnt', function () use ($valid) {
 });
 
 test('Honeypot: Bot erhält Bestätigung, gespeichert wird nichts', function () use ($valid) {
-	$before = count(request_drafts());
+	$before = count(stored_requests());
 	$http = new HttpClient();
 	$hidden = hidden_fields($http->get('/termin-anfragen')['body']);
 	$response = $http->post('/termin-anfragen', [...$valid(), ...$hidden, 'website' => 'https://spam.example']);
 	assert_same(303, $response['status']);
-	assert_same($before, count(request_drafts()));
+	assert_same($before, count(stored_requests()));
 });
 
 test('manipulierte Zeitfalle wird als Bot gewertet', function () use ($valid) {
-	$before = count(request_drafts());
+	$before = count(stored_requests());
 	$http = new HttpClient();
 	$hidden = hidden_fields($http->get('/termin-anfragen')['body']);
 	$response = $http->post('/termin-anfragen', [...$valid(), ...$hidden, 'formstart' => '1.abc']);
 	assert_same(303, $response['status']);
-	assert_same($before, count(request_drafts()));
+	assert_same($before, count(stored_requests()));
 
 	// Unvollständig und zu schnell: Menschen bekommen trotzdem Fehlermeldungen
 	$hidden = hidden_fields($http->get('/termin-anfragen')['body']);
@@ -83,7 +81,7 @@ test('Validierungsfehler stehen am Feld, Eingaben bleiben erhalten', function ()
 });
 
 test('gültige Anfrage: speichern, Post/Redirect/Get ohne Daten in der URL', function () use ($valid) {
-	$before = count(request_drafts());
+	$before = count(stored_requests());
 	$http = new HttpClient();
 	$hidden = hidden_fields($http->get('/termin-anfragen?termin=beispieltermin-noch-frei-16-10')['body']);
 	$response = $http->post('/termin-anfragen', [...$valid(), ...$hidden]);
@@ -92,12 +90,25 @@ test('gültige Anfrage: speichern, Post/Redirect/Get ohne Daten in der URL', fun
 	$location = $response['headers']['location'][0] ?? '';
 	assert_true(str_ends_with($location, '/termin-anfragen/danke'), $location);
 	assert_not_contains('?', $location);
-	assert_same($before + 1, count(request_drafts()), 'als Entwurf gespeichert');
+	assert_same($before + 1, count(stored_requests()), 'als nicht veröffentlichte Seite gespeichert');
 
-	$drafts = request_drafts();
+	// Benachrichtigung an die Redaktion und Eingangsbestätigung
+	$mails = array_values(array_filter(received_mails(), fn ($m) => str_contains($m, 'HTTP-Testgruppe') || str_contains($m, 'http-test@example.org')));
+	assert_same(2, count($mails), 'zwei E-Mails');
+	[$notification, $receipt] = str_contains($mails[0], 'Neue Terminanfrage') ? $mails : array_reverse($mails);
+	assert_contains('X-Envelope-RCPT: TO:<redaktion@example.org>', $notification, 'an die Empfängeradresse aus den Einstellungen');
+	assert_contains('Reply-To: http-test@example.org', $notification);
+	assert_contains('/admin/pages/edit/anfragen/anfrage-', $notification, 'Link in den Admin');
+	assert_not_contains('Wir testen das Formular', $notification, 'Formulartext nur im Admin, nicht in der Mail');
+	assert_contains('X-Envelope-RCPT: TO:<http-test@example.org>', $receipt);
+	assert_contains('180 Tagen automatisch gel', $receipt);
+
+	$drafts = stored_requests();
 	$stored = file_get_contents(end($drafts));
 	assert_contains('HTTP-Testgruppe', $stored);
-	assert_contains('Processing: neu', $stored);
+	assert_contains('processing: neu', $stored);
+	assert_contains('published: false', $stored);
+	assert_contains('routable: false', $stored);
 
 	$thanks = $http->get('/termin-anfragen/danke');
 	assert_same(200, $thanks['status']);

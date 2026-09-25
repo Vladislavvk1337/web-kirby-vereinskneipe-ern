@@ -1,0 +1,12 @@
+# Bewusst akzeptierte Befunde des Image-Scans (CI: .github/workflows/docker.yml).
+# Jeder Eintrag braucht eine Begründung und wird bei jedem Grav-/Plugin-Update
+# neu geprüft (Docker.md, „Updates“). Stand: 2026-09-25.
+
+# symfony/mailer und symfony/mime 5.4.45 im offiziellen Grav-Plugin „email“
+# (5.3.0, gebündelt in grav-admin-v2.2.0.zip). Upstream liefert noch keine
+# neuere Version. Abmilderung: Adressen aus dem Anfrageformular werden vor dem
+# Versand streng geprüft (RequestValidator: FILTER_VALIDATE_EMAIL, keine
+# Steuerzeichen/Zeilenumbrüche); Empfänger der Redaktion stammen aus den
+# Einstellungen (nur Administration). Entfernen, sobald das Plugin aktualisiert ist.
+CVE-2026-45068 exp:2026-12-31
+CVE-2026-45067 exp:2026-12-31

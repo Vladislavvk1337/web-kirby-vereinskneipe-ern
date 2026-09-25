@@ -1,0 +1,9 @@
+{# Gestalteter Leerzustand statt technischer Meldung. Variablen: title, text, link_url, link_text #}
+<div class="empty-state">
+  {{ icon('calendar', 'empty-state__icon') }}
+  <p class="empty-state__title">{{ title }}</p>
+  <p>{{ text }}</p>
+  {% if link_url is defined and link_url %}
+  <p><a class="link-arrow" href="{{ link_url }}">{{ link_text ?? 'Weiter' }}{{ icon('arrow') }}</a></p>
+  {% endif %}
+</div>

@@ -1,0 +1,23 @@
+{# Kopfbereich mit Bildmarke und Hauptnavigation (ohne JavaScript bedienbar) #}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="{{ kneipe.url('/') }}"{% if page.home %} aria-current="page"{% endif %}>
+      {% include 'partials/logo-mark.html.twig' %}
+      <span class="brand__name">{{ kneipe.name }}</span>
+    </a>
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      <button class="site-nav__toggle" type="button" aria-expanded="false" aria-controls="hauptmenue" hidden>
+        {{ icon('menu', 'site-nav__icon-open') }}
+        {{ icon('close', 'site-nav__icon-close') }}
+        <span>Menü</span>
+      </button>
+      <ul class="site-nav__list" id="hauptmenue">
+        <li><a href="{{ kneipe.url('/') }}"{% if page.home %} aria-current="page"{% endif %}>Start</a></li>
+        {% for item in pages.children.visible %}
+        {% set current = item.active ? 'page' : (item.activeChild ? 'true' : '') %}
+        <li><a href="{{ item.url }}"{% if current %} aria-current="{{ current }}"{% endif %}>{{ item.header.navtitle ?: item.menu }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,121 @@
+# Admin2-Formular für Seiten mit Template „article“ (Theme kneipe).
+title: Meldung oder Rückblick
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Beitrag
+          fields:
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            header.kind:
+              type: select
+              label: Art
+              default: meldung
+              options:
+                meldung: Meldung
+                rueckblick: Rückblick
+            header.date:
+              type: datetime
+              label: Datum
+              format: Y-m-d
+              validate:
+                required: true
+            header.teaser:
+              type: textarea
+              label: Kurztext
+              rows: 3
+              validate:
+                max: 400
+            content:
+              type: markdown
+              label: Text
+              validate:
+                type: textarea
+                max: 0
+            header.event:
+              type: pages
+              label: Zugehöriger Termin
+              start_route: /termine
+              show_root: false
+              show_all: false
+            header.cover:
+              type: filepicker
+              label: Titelbild
+              folder: '@self'
+              preview_images: true
+              accept:
+              - .jpg
+              - .jpeg
+              - .png
+              - .webp
+            header.gallery:
+              type: list
+              label: Bildergalerie
+              style: vertical
+              fields:
+                .image:
+                  type: filepicker
+                  label: Bild
+                  folder: '@self'
+                  preview_images: true
+                  accept:
+                  - .jpg
+                  - .jpeg
+                  - .png
+                  - .webp
+            header.media_order:
+              type: pagemedia
+              label: Bilder hochladen
+            header.seotitle:
+              type: text
+              label: Titel für Suchmaschinen (optional)
+            header.seodescription:
+              type: textarea
+              label: Beschreibung für Suchmaschinen (optional)
+              rows: 2
+            header.noindex:
+              type: toggle
+              label: Nicht in Suchmaschinen aufnehmen
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.createdby:
+              type: text
+              label: Angelegt von
+              readonly: true
+            header.modifiedby:
+              type: text
+              label: Zuletzt geändert von
+              readonly: true
+            header.modifiedat:
+              type: text
+              label: Zuletzt geändert am
+              readonly: true
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

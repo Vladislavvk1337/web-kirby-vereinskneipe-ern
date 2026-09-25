@@ -1,0 +1,89 @@
+# Admin2-Formular für Seiten mit Template „about“ (Theme kneipe).
+title: Über uns
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Inhalt
+          fields:
+            admin:
+              type: display
+              markdown: true
+              content: Diese Seite bearbeitet nur die **Administration**.
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            header.intro:
+              type: textarea
+              label: Einleitung
+              rows: 3
+            content:
+              type: markdown
+              label: Text
+              validate:
+                type: textarea
+                max: 0
+            header.facts:
+              type: list
+              label: Das Wichtigste in Kürze
+              style: vertical
+              fields:
+                .title:
+                  type: text
+                  label: Titel
+                .text:
+                  type: textarea
+                  label: Text
+                  rows: 2
+            header.cover:
+              type: filepicker
+              label: Bild
+              folder: '@self'
+              preview_images: true
+              accept:
+              - .jpg
+              - .jpeg
+              - .png
+              - .webp
+            header.media_order:
+              type: pagemedia
+              label: Bilder hochladen
+            header.seotitle:
+              type: text
+              label: Titel für Suchmaschinen (optional)
+            header.seodescription:
+              type: textarea
+              label: Beschreibung für Suchmaschinen (optional)
+              rows: 2
+            header.noindex:
+              type: toggle
+              label: Nicht in Suchmaschinen aufnehmen
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

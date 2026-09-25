@@ -1,0 +1,37 @@
+{# Aktuelles und Rückblicke, 10 je Seite (?seite=2) #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set all = kneipe.articles %}
+{% set per_page = 10 %}
+{% set current = max(1, (uri.query('seite') ?: 1)|number_format(0, '', '')|abs) %}
+{% set pages_total = max(1, (all|length / per_page)|round(0, 'ceil')) %}
+{% set current = min(current, pages_total) %}
+{% set articles = all|slice((current - 1) * per_page, per_page) %}
+{% set past = kneipe.pastEvents(3) %}
+{% include 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+<div class="container section news">
+  <div class="news__list">
+    {% if articles|length %}
+      {% for article in articles %}{% include 'partials/article-teaser.html.twig' with {article: article} %}{% endfor %}
+      {% if pages_total > 1 %}
+      <nav class="pagination" aria-label="Weitere Beiträge">
+        {% if current > 1 %}<a href="{{ page.url }}{{ current > 2 ? '?seite=' ~ (current - 1) : '' }}">Neuere Beiträge</a>{% endif %}
+        {% if current < pages_total %}<a href="{{ page.url }}?seite={{ current + 1 }}">Ältere Beiträge</a>{% endif %}
+      </nav>
+      {% endif %}
+    {% else %}
+      {% include 'partials/empty-state.html.twig' with {title: 'Noch keine Meldungen.', text: 'Neuigkeiten und Rückblicke erscheinen hier, sobald die Redaktion sie veröffentlicht.'} %}
+    {% endif %}
+  </div>
+  {% if past|length %}
+  <aside class="news__aside" aria-labelledby="zuletzt-titel">
+    <h2 id="zuletzt-titel" class="h-small">Zuletzt in der Kneipe</h2>
+    <ul class="event-list event-list--compact">
+      {% for event in past %}{% include 'partials/event-item.html.twig' with {event: event} %}{% endfor %}
+    </ul>
+    <p><a class="link-arrow" href="{{ kneipe.url('/termine') }}?zeitraum=vergangen#kalender">Alle vergangenen Termine{{ icon('arrow') }}</a></p>
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

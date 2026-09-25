@@ -1,0 +1,6 @@
+{# Öffentlicher Status als Text mit Symbol – nie nur über Farbe. Variable: event #}
+{% set key = event.publicStatus %}
+{% if key %}
+{% set icons = {frei: 'free', bestaetigt: 'check', abgesagt: 'cancel', geschlossen: 'lock'} %}
+<span class="status status--{{ key }}">{{ icon(icons[key]) }}<span>{{ event.publicStatusLabel }}</span></span>
+{% endif %}

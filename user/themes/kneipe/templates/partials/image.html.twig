@@ -1,0 +1,10 @@
+{#
+  Responsives Bild mit festen Abmessungen und srcset.
+  Variablen: image (Medium), ratio (Breite/Höhe), sizes, lazy (Standard ja),
+  class, width/height (für SVG-Logos)
+#}
+{% set attrs = kneipe.imageAttrs(image, ratio ?? null) %}
+{% if attrs %}
+{% set is_lazy = lazy ?? true %}
+<img src="{{ attrs.src }}"{% if attrs.srcset %} srcset="{{ attrs.srcset }}" sizes="{{ sizes ?? '100vw' }}"{% endif %} alt="{{ attrs.alt }}" width="{{ attrs.width ?? width ?? 160 }}" height="{{ attrs.height ?? height ?? 160 }}"{% if class is defined and class %} class="{{ class }}"{% endif %}{% if is_lazy %} loading="lazy"{% else %} fetchpriority="high"{% endif %} decoding="async">
+{% endif %}

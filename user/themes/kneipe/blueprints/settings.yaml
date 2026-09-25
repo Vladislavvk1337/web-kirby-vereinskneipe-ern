@@ -1,0 +1,150 @@
+# Admin2-Formular für Seiten mit Template „settings“ (Theme kneipe).
+title: Einstellungen
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        stammdaten:
+          type: tab
+          title: Stammdaten
+          fields:
+            info:
+              type: display
+              markdown: true
+              content: Stammdaten und Einstellungen pflegt nur die **Administration**. Fehlende Angaben erscheinen auf der Website als markierte Platzhalter.
+            header.title:
+              type: text
+              label: Titel dieser Seite
+              default: Einstellungen
+            header.name:
+              type: text
+              label: Name der Kneipe
+              placeholder: Ehrenamtskneipe Erndtebrück
+            header.claim:
+              type: text
+              label: Claim
+            header.description:
+              type: textarea
+              label: Kurzbeschreibung (Startseite, Suchmaschinen)
+              rows: 3
+            header.venue:
+              type: text
+              label: Name des Ortes / Gebäudes
+            header.street:
+              type: text
+              label: Straße und Hausnummer
+            header.postalcode:
+              type: text
+              label: Postleitzahl
+              validate:
+                pattern: ^[0-9]{5}$
+            header.city:
+              type: text
+              label: Ort
+              default: Erndtebrück
+            header.latitude:
+              type: text
+              label: Breitengrad (für den Kartenlink, optional)
+            header.longitude:
+              type: text
+              label: Längengrad (für den Kartenlink, optional)
+            header.email:
+              type: email
+              label: E-Mail-Adresse
+            header.phone:
+              type: text
+              label: Telefonnummer
+            header.openinghours:
+              type: list
+              label: Öffnungszeiten
+              style: vertical
+              fields:
+                .days:
+                  type: text
+                  label: Tage
+                .time:
+                  type: text
+                  label: Uhrzeit
+                .note:
+                  type: text
+                  label: Hinweis
+            header.openingnote:
+              type: textarea
+              label: Hinweis zu den Öffnungszeiten
+              rows: 2
+            header.social:
+              type: list
+              label: Soziale Netzwerke
+              style: vertical
+              fields:
+                .platform:
+                  type: text
+                  label: Plattform
+                .url:
+                  type: url
+                  label: Adresse
+        recht:
+          type: tab
+          title: Rechtliches
+          fields:
+            header.operator:
+              type: text
+              label: Betreiber/Träger
+            header.legalrepresentative:
+              type: textarea
+              label: Vertretungsberechtigte Person(en)
+              rows: 2
+            header.legalregister:
+              type: text
+              label: Registereintrag (z. B. Vereinsregister)
+            header.legalresponsible:
+              type: textarea
+              label: Verantwortlich nach § 18 Abs. 2 MStV
+              rows: 2
+            header.legalhoster:
+              type: textarea
+              label: Hosting-Anbieter (für die Datenschutzerklärung)
+              rows: 2
+            header.legalmailprovider:
+              type: textarea
+              label: E-Mail-Anbieter (für die Datenschutzerklärung)
+              rows: 2
+        workflow:
+          type: tab
+          title: Freigabe und Anfragen
+          fields:
+            header.approvalmode:
+              type: toggle
+              label: Freigabemodus
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+              help: 'An: Die Moderation bereitet Termine vor, bestätigen und veröffentlichen darf nur die Administration.'
+            header.requestrecipient:
+              type: email
+              label: Empfänger für neue Terminanfragen
+              help: Leer = E-Mail-Adresse aus den Stammdaten.
+            header.requestreceipt:
+              type: toggle
+              label: Eingangsbestätigung an die anfragende Person senden
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.retentiondays:
+              type: number
+              label: Löschfrist für Anfragen (Tage)
+              default: 180
+              validate:
+                min: 1
+                max: 3650

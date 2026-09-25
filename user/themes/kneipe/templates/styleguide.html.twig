@@ -1,0 +1,94 @@
+{# Design-System-Übersicht (/bausteine) – nicht verlinkt, nicht indexiert #}
+{% extends 'partials/base.html.twig' %}
+{% set noindex = true %}
+{% set styles = ['form', 'calendar'] %}
+
+{% block content %}
+{% set sample = kneipe.upcomingEvents(1, true)|first %}
+{% set tokens = [
+  ['--ui-eder-900', 'Eder-Blau, dunkel', 'Kopf- und Fußbereich, Überschriften'],
+  ['--ui-eder-700', 'Eder-Blau', 'Links, sekundäre Knöpfe'],
+  ['--ui-amber-400', 'Bernstein', 'Primäre Knöpfe, Akzente'],
+  ['--ui-amber-800', 'Bernstein, dunkel', 'Akzenttext auf Creme'],
+  ['--ui-cream-50', 'Creme', 'Seitenhintergrund'],
+  ['--ui-cream-200', 'Creme, dunkler', 'Flächen, Linien'],
+  ['--ui-ink', 'Anthrazit', 'Fließtext'],
+  ['--ui-moss-600', 'Moosgrün', 'Status „frei“ – sparsam'],
+  ['--ui-danger', 'Ziegelrot', 'Fehler, „abgesagt“']
+] %}
+{% include 'partials/page-head.html.twig' with {title: 'Bausteine', eyebrow: 'Design-System', intro: 'Alle Gestaltungselemente der Website auf einen Blick. Farben, Schriften und Abstände stehen ausschließlich in user/themes/kneipe/css/tokens.css.'} %}
+<div class="container section styleguide">
+  <section aria-labelledby="sg-farben">
+    <h2 id="sg-farben">Farben</h2>
+    <ul class="swatches">
+      {% for t in tokens %}
+      <li class="swatch"><span class="swatch__color swatch__color{{ t[0]|replace({'--ui': ''}) }}"></span><strong>{{ t[1] }}</strong><code>{{ t[0] }}</code><span class="muted small">{{ t[2] }}</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section aria-labelledby="sg-schrift">
+    <h2 id="sg-schrift">Schrift</h2>
+    <p class="eyebrow">Eyebrow · Atkinson Hyperlegible Next</p>
+    <p class="sg-display">Fraunces – Überschriften mit Charakter</p>
+    <h3>Überschrift dritter Ordnung</h3>
+    <p class="lead">Einleitungstext: etwas größer, für den ersten Absatz einer Seite.</p>
+    <p>Fließtext in Atkinson Hyperlegible Next – entwickelt für besonders gute Lesbarkeit, auch bei eingeschränktem Sehvermögen. Mindestens 16 px, fluide bis 19 px. <a href="#sg-schrift">Ein Textlink</a> und <strong>fette Hervorhebung</strong>.</p>
+    <p><mark class="placeholder">[Platzhalter: So erscheinen fehlende Angaben]</mark></p>
+  </section>
+
+  <section aria-labelledby="sg-knoepfe">
+    <h2 id="sg-knoepfe">Knöpfe und Links</h2>
+    <p class="sg-row">
+      <a class="button button--primary" href="#sg-knoepfe">Primär{{ icon('arrow') }}</a>
+      <a class="button button--secondary" href="#sg-knoepfe">Sekundär</a>
+      <a class="button button--quiet" href="#sg-knoepfe">Zurückhaltend</a>
+      <a class="link-arrow" href="#sg-knoepfe">Link mit Pfeil{{ icon('arrow') }}</a>
+    </p>
+    <p class="muted small">Pro Abschnitt höchstens ein primärer Knopf. Alle Ziele mindestens 44 × 44 px.</p>
+  </section>
+
+  <section aria-labelledby="sg-status">
+    <h2 id="sg-status">Status</h2>
+    <p class="sg-row">
+      <span class="status status--frei">{{ icon('free') }}<span>Termin frei</span></span>
+      <span class="status status--bestaetigt">{{ icon('check') }}<span>Termin bestätigt</span></span>
+      <span class="status status--abgesagt">{{ icon('cancel') }}<span>Veranstaltung abgesagt</span></span>
+      <span class="status status--geschlossen">{{ icon('lock') }}<span>Geschlossen</span></span>
+    </p>
+  </section>
+
+  <section aria-labelledby="sg-liste">
+    <h2 id="sg-liste">Terminliste</h2>
+    {% if sample %}
+    <ul class="event-list">{% include 'partials/event-item.html.twig' with {event: sample} %}</ul>
+    {% endif %}
+    {% include 'partials/empty-state.html.twig' with {title: 'Leerzustand', text: 'So sieht es aus, wenn es nichts anzuzeigen gibt.'} %}
+  </section>
+
+  <section aria-labelledby="sg-hinweise">
+    <h2 id="sg-hinweise">Hinweise</h2>
+    <div class="notice">{{ icon('info') }}<p>Neutraler Hinweis.</p></div>
+    <div class="notice notice--success">{{ icon('check') }}<p>Erfolg.</p></div>
+    <div class="notice notice--warning">{{ icon('alert') }}<p>Warnung.</p></div>
+    <div class="notice notice--danger">{{ icon('cancel') }}<p>Fehler oder Absage.</p></div>
+  </section>
+
+  <section aria-labelledby="sg-formular">
+    <h2 id="sg-formular">Formularfelder</h2>
+    <form class="form" action="#sg-formular">
+      {% include 'partials/form-field.html.twig' with {name: 'beispiel', label: 'Textfeld', required: true, values: {}, errors: {}, hint: 'Hinweis zum Feld.'} only %}
+      {% include 'partials/form-field.html.twig' with {name: 'fehler', label: 'Feld mit Fehler', required: true, values: {fehler: 'falsch@'}, errors: {fehler: 'So erscheint eine Fehlermeldung direkt am Feld.'}} only %}
+    </form>
+  </section>
+
+  <section aria-labelledby="sg-logo">
+    <h2 id="sg-logo">Logo</h2>
+    <p class="sg-row sg-logos">
+      <img src="{{ asset('theme://images/brand/logo.svg') }}" alt="Bildmarke farbig" width="96" height="96">
+      <img src="{{ asset('theme://images/brand/logo-mono.svg') }}" alt="Bildmarke einfarbig" width="96" height="96">
+      <img src="{{ asset('theme://images/brand/wordmark.svg') }}" alt="Wortmarke" width="320" height="96">
+    </p>
+  </section>
+</div>
+{% endblock %}

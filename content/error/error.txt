@@ -1,9 +1,0 @@
-Title: Seite nicht gefunden
-
-----
-
-Text: Diese Seite gibt es leider nicht (mehr). Vielleicht hilft einer der Links unten weiter.
-
-----
-
-Uuid: 11f9578d05e6f7bb

@@ -1,0 +1,14 @@
+{# Meldung oder Rückblick in einer Liste. Variablen: article (Seite), level #}
+{% set level = level ?? 2 %}
+{% set cover = kneipe.image(article, article.header.cover) %}
+{% set date = kneipe.timestamp(article.header.date) %}
+<article class="article-teaser{{ cover ? ' article-teaser--image' : '' }}">
+  {% if cover %}
+  <div class="article-teaser__image">{% include 'partials/image.html.twig' with {image: cover, ratio: 1.5, sizes: '(min-width: 48em) 40vw, 100vw'} %}</div>
+  {% endif %}
+  <div class="article-teaser__body">
+    <p class="article-teaser__meta"><span class="tag">{{ article.header.kind == 'rueckblick' ? 'Rückblick' : 'Meldung' }}</span>{% if date %} <time datetime="{{ date|date('Y-m-d') }}">{{ kneipe.formatDate(date, 'd. MMMM y') }}</time>{% endif %}</p>
+    <h{{ level }} class="article-teaser__title"><a href="{{ article.url }}">{{ article.title }}</a></h{{ level }}>
+    {% if article.header.teaser %}<p>{{ ktext(article.header.teaser) }}</p>{% endif %}
+  </div>
+</article>

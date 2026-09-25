@@ -1,0 +1,20 @@
+{# 404 und andere Fehler – freundlich, mit Wegen weiter #}
+{% extends 'partials/base.html.twig' %}
+{% set noindex = true %}
+
+{% block content %}
+{% set code = page.header.http_response_code ?? 404 %}
+{% include 'partials/page-head.html.twig' with {
+  title: code == 404 ? (page.title ?: 'Seite nicht gefunden') : 'Da ist etwas schiefgegangen',
+  eyebrow: 'Fehler ' ~ code,
+  intro: code == 404 ? (page.header.text ?: 'Diese Seite gibt es nicht (mehr).') : 'Bitte versucht es in ein paar Minuten noch einmal.'
+} %}
+<div class="container section">
+  <ul class="link-cards">
+    <li><a href="{{ kneipe.url('/') }}">{{ icon('arrow') }}Zur Startseite</a></li>
+    <li><a href="{{ kneipe.url('/termine') }}">{{ icon('calendar') }}Alle Termine</a></li>
+    <li><a href="{{ kneipe.url('/termin-anfragen') }}">{{ icon('free') }}Termin anfragen</a></li>
+    <li><a href="{{ kneipe.url('/kontakt') }}">{{ icon('mail') }}Kontakt</a></li>
+  </ul>
+</div>
+{% endblock %}

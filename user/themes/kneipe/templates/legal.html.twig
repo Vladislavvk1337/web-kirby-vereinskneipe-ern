@@ -1,0 +1,15 @@
+{# Impressum, Datenschutz, Barrierefreiheit – nur die Administration bearbeitet sie #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% include 'partials/page-head.html.twig' with {title: page.title} %}
+<div class="container container--narrow section">
+  {% if page.header.draftnote ?? true %}
+  <div class="notice notice--warning" role="note">{{ icon('alert') }}<p><strong>Entwurf:</strong> Dieser Text ist noch nicht rechtlich geprüft. Markierte Stellen müssen vor dem Livegang ergänzt werden.</p></div>
+  {% endif %}
+  <div class="prose">{{ kneipe.legalHtml(page.content)|raw }}</div>
+  {% if page.header.reviewed %}
+  <p class="muted small">Zuletzt geprüft: {{ kneipe.formatDate(kneipe.timestamp(page.header.reviewed), 'd. MMMM y') }}</p>
+  {% endif %}
+</div>
+{% endblock %}

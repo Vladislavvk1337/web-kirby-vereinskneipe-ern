@@ -1,0 +1,62 @@
+# Umgebung „staging“:
+#   kubectl apply -k k8s/overlays/staging
+# Vorher das Secret kneipe-web-secrets im Namespace kneipe-staging anlegen
+# (k8s/base/secret.example.yaml). Hostname und Image-Tag sind PLATZHALTER.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kneipe-staging
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/vladislavvk1337/web-kirby-vereinskneipe-ern
+    newTag: main
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: kneipe-web-config
+    patch: |-
+      - op: replace
+        path: /data/GRAV_ENVIRONMENT
+        value: staging
+      - op: replace
+        path: /data/GRAV_CONFIG__system__custom_base_url
+        value: https://staging.kneipe.example.org
+      - op: replace
+        path: /data/GRAV_CONFIG__plugins__login__site_host
+        value: https://staging.kneipe.example.org
+      - op: replace
+        path: /data/KNEIPE_NOINDEX
+        value: "true"
+  - target:
+      kind: Ingress
+      name: kneipe-web
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging.kneipe.example.org
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: staging.kneipe.example.org
+  - target:
+      kind: PersistentVolumeClaim
+      name: kneipe-web-data
+    patch: |-
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 2Gi
+  - target:
+      kind: Deployment
+      name: kneipe-web
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 100m
+            memory: 192Mi
+          limits:
+            memory: 512Mi

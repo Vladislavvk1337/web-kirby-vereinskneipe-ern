@@ -1,0 +1,12 @@
+name: Kneipe
+slug: kneipe
+type: theme
+version: 1.0.0
+description: 'Barrierearmes Theme der Ehrenamtskneipe Erndtebrück – ohne externe Ressourcen, funktioniert ohne JavaScript'
+icon: beer
+author:
+  name: 'Ehrenamtskneipe Erndtebrück'
+license: proprietary
+dependencies:
+  - { name: grav, version: '>=2.2.0' }
+  - { name: kneipe, version: '>=1.0.0' }
