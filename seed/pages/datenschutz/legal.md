@@ -21,9 +21,9 @@ E-Mail: (stammdaten: email)
 
 ## 2. Hosting und Server-Protokolle
 
-Die Website läuft auf einem Server von: (stammdaten: hoster).
+Die Website läuft in einer Container-Umgebung (Kubernetes) bei: (stammdaten: hoster).
 
-Beim Aufruf speichert der Server technisch notwendige Angaben (Datum, Uhrzeit, aufgerufene Adresse, Browserkennung, gekürzte IP-Adresse). Die IP-Adresse wird vor dem Speichern gekürzt (IPv4 auf /24, IPv6 auf /48). Die Protokolle werden nach 14 Tagen gelöscht. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (sicherer Betrieb der Website). [Platzhalter: juristisch prüfen]
+Beim Aufruf verarbeitet der Webserver technisch notwendige Angaben (Datum, Uhrzeit, aufgerufene Adresse, Browserkennung, IP-Adresse), um die Website auszuliefern und vor Missbrauch zu schützen. Die Website selbst schreibt kein Zugriffsprotokoll; der vorgeschaltete Zugangsserver (Ingress) des Hosting-Anbieters kann Zugriffe protokollieren. [Platzhalter: Umfang, Kürzung der IP-Adresse und Speicherdauer dieser Protokolle beim Hosting-Anbieter erfragen und hier eintragen] Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (sicherer Betrieb der Website). [Platzhalter: juristisch prüfen]
 
 ## 3. Keine Tracking-Dienste, keine externen Inhalte
 
@@ -33,7 +33,7 @@ Die Website verwendet keine Analyse- oder Marketingdienste, keine Social-Media-E
 
 Die Website setzt nur technisch notwendige Cookies:
 
-- **kirby_session** – wird beim Aufruf des Formulars „Termin anfragen“ gesetzt, um das Formular vor Missbrauch (CSRF) zu schützen, und beim Anmelden im Redaktionsbereich. Das Cookie enthält keine persönlichen Angaben und wird nach Ende der Sitzung ungültig.
+- **kneipe-…** (Sitzungs-Cookie) – wird nur beim Aufruf des Formulars „Termin anfragen“ gesetzt, um das Formular vor Missbrauch (CSRF) zu schützen. Das Cookie enthält keine persönlichen Angaben und läuft nach 30 Minuten ab. Im Redaktionsbereich speichert der Browser zusätzlich die technisch notwendigen Anmeldedaten der angemeldeten Person.
 
 Ein Cookie-Banner ist deshalb nicht nötig. [Platzhalter: juristisch prüfen]
 

@@ -23,4 +23,4 @@ published: true
 
 So könnte die ausführliche Beschreibung eines Abends aussehen: Wer steht hinter der Theke, was ist geplant, und worauf können sich Gäste freuen?
 
-Dieser Text ist ein **Demo-Inhalt** und wird im Panel durch echte Angaben ersetzt.
+Dieser Text ist ein **Demo-Inhalt** und wird im Admin durch echte Angaben ersetzt.

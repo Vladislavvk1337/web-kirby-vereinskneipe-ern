@@ -13,6 +13,8 @@ test('Anmeldung: beide Rollen erhalten ein Token, falsches Passwort nicht', func
 	ApiClient::moderation();
 	$wrong = (new HttpClient())->request('POST', '/api/v1/auth/token', json_encode(['username' => 'admin', 'password' => 'falsch']), ['Content-Type: application/json']);
 	assert_true(in_array($wrong['status'], [401, 403], true), 'HTTP ' . $wrong['status']);
+	assert_same(401, (new HttpClient())->get('/api/v1/pages/termine')['status'], 'API ohne Anmeldung');
+	assert_same(401, (new HttpClient())->get('/api/v1/kneipe/overview')['status'], 'Redaktionsübersicht ohne Anmeldung');
 });
 
 test('Moderation: keine Konten anderer, keine Einstellungen, keine Rechtstexte', function () use ($pageHead) {

@@ -1,167 +1,109 @@
 # Architektur
 
-Kurzüberblick über Aufbau, Datenfluss und die wichtigsten Entscheidungen.
-Details zu Feldern: [content-model.md](content-model.md).
+Überblick über den Aufbau der Anwendung. Betrieb, Container und Kubernetes:
+[Docker.md](../Docker.md).
 
 ## Grundlage
 
-| Baustein | Entscheidung | Begründung |
-| --- | --- | --- |
-| CMS | **Kirby 5.6** (aktuelle stabile Version), Grundlage **Plainkit** | Dateibasiert, keine Datenbank, Panel für die Redaktion, Rollen und Hooks im Kern |
-| Installation | Kirby über **Composer** (`getkirby/cms`), nicht im Repository | Updates über `composer update`, reproduzierbar über `composer.lock` |
-| Plugins | **keine fremden Plugins** – ein eigenes Projekt-Plugin `site/plugins/kneipe` | Weniger Abhängigkeiten, alles nachvollziehbar |
-| Frontend | Serverseitige Kirby-Templates, eigenes CSS, 1 kleines Skript (1,2 KB) | Keine SPA, kein Framework, funktioniert ohne JavaScript |
-| Schriften | Fraunces (Überschriften) + Atkinson Hyperlegible Next (Text), lokal | Datenschutz, Lesbarkeit, SIL Open Font License |
-| Server | Debian + basis-schutz-os + Caddy + PHP-FPM | Wie `astro-web-basic-template`, erweitert um Kirby |
+- **Grav CMS 2.2** (Flat-File, keine Datenbank) mit **Admin2** (SvelteKit-
+  Oberfläche) und dem **API-Plugin** (REST-API, über die Admin2 arbeitet).
+  Beides stammt unverändert aus dem offiziellen Paket `grav-admin-v2.2.0.zip`.
+- Weitere mitgelieferte Plugins: `login`, `form`, `email`, `error`,
+  `flex-objects`, `shortcode-core` (Abhängigkeiten von Admin2/API).
+- Projekt-Plugin `kneipe` und Theme `kneipe` – beide im Repository.
 
 ## Verzeichnisse
 
-```
-index.php                 Einstieg; Roots aus Umgebungsvariablen (site/bootstrap.php)
-assets/
-  css/                    tokens.css (einzige Quelle für Farben/Schrift/Abstände),
-                          site.css, calendar.css, form.css, print.css, panel.css
-  js/site.js              Menü einklappen, Fokus auf Fehlerübersicht
-  fonts/                  WOFF2 + Lizenzen
-  brand/                  Logo, Wortmarke, Monochrom, Favicon, Social-Bild
-content/                  Startinhalt und Demo-Inhalte (auf dem Server außerhalb des Codes)
-site/
-  blueprints/             pages/, users/, files/, fields/, sections/, tabs/, options/, site.yml
-  config/                 config.php (Produktion), config.localhost.php (lokal), panel-menu.php
-  controllers/            Logik je Seitentyp (Kalender, Formular, Termin)
-  models/                 EventPage, EventsPage, TeamPage
-  plugins/kneipe/         Projekt-Plugin
-    src/                  reine PHP-Klassen – ohne Kirby testbar
-    hooks.php             Freigabeworkflow, Überschneidung, Protokoll, Rechte
-    routes.php            robots.txt, sitemap.xml, Sperre für /anfragen
-    blueprints.php        rollenabhängige Reiter im Dashboard
-  snippets/, templates/   Ausgabe (inkl. *.ics.php für iCalendar)
-bin/                      CLI: Benutzer anlegen, Löschfrist anwenden
-deploy/                   Server: site.env, Caddy, PHP-Pool, Skripte, systemd
-tests/                    unit/, integration/, http/, browser/
-docs/                     diese Dokumentation
-```
+| Pfad | Inhalt |
+| --- | --- |
+| `user/plugins/kneipe/kneipe.php` | Anbindung an Grav: Ereignisse, Routen (ICS, Sitemap, robots.txt, Health), Sichtbarkeit, Formular, Admin2-Erweiterungen |
+| `user/plugins/kneipe/classes/` | `Calendar`, `EventStatus`, `Overlap`, `Ics`, `RequestValidator`, `FormTimer`, `RateLimiter`, `Richtext`, `Changelog`, `Workflow` (ohne Grav testbar); `Service`, `EventEntry`, `TeamEntry`, `CalendarView`, `Feeds`, `RequestForm`, `Retention`, `Health`, `Guard`, `OverviewController`, `TwigHelpers` (Grav-Anbindung) |
+| `user/plugins/kneipe/cli/` | `bin/plugin kneipe user` (Konten), `bin/plugin kneipe maintenance` (Löschfrist) |
+| `user/plugins/kneipe/admin-next/pages/kneipe.js` | Redaktionsübersicht im Admin (Web Component, ohne Framework) |
+| `user/themes/kneipe/templates/` | Twig-Templates je Seitenart, `partials/` |
+| `user/themes/kneipe/blueprints/` | Formulare der Seitenarten für Admin2 |
+| `user/themes/kneipe/css`, `js`, `fonts`, `icons`, `images/brand` | Gestaltung (Tokens in `css/tokens.css`) |
+| `user/config/`, `user/env/<env>/config/` | Konfiguration, Gruppen (`groups.yaml`) |
+| `setup.php` | beschreibbare Konfigurationsebene `$GRAV_DATA_DIR/config` für Schlüsseldateien |
+| `seed/pages/` | Beispielinhalte (aus der Kirby-Migration erzeugt) |
 
-## Datenmodell (Kurzfassung)
+## Seiten
 
 ```
-site (Stammdaten, Einstellungen, Dashboard)
-├── home                     Startseite
-├── termine        (events)  ─┬─ event  ×n   Termin (Entwurf oder veröffentlicht)
-├── thekenteams    (teams)   ─┴─ team   ×n   Thekenteam  ◄── event.team
-├── mitmachen      (join)
-├── ueber-uns      (about)
-├── kontakt        (contact)
-├── aktuelles      (news)    ─── article ×n  Meldung/Rückblick ──► event (optional)
-├── termin-anfragen (requestform) ── danke (confirmation)
-├── anfragen       (requests) ── request ×n  nur Entwürfe, nie öffentlich
-├── impressum, datenschutz, barrierefreiheit  (legal)
-├── bausteine      (styleguide, noindex)
-└── error
+home/                     Startseite (home)
+01.termine/               Terminübersicht (events), darunter je Termin (event)
+02.thekenteams/           Übersicht (teams), darunter je Team (team)
+03.mitmachen/  04.ueber-uns/  05.kontakt/
+aktuelles/                Meldungen und Rückblicke (news → article)
+termin-anfragen/          Anfrageformular (requestform), danke/ (confirmation)
+anfragen/                 Anfragen (requests → request) – nie öffentlich
+einstellungen/            Stammdaten und Einstellungen (settings) – nie öffentlich
+impressum/ datenschutz/ barrierefreiheit/   Rechtstexte (legal)
+bausteine/                Design-System (styleguide), nicht verlinkt
+error/                    Fehlerseite
 ```
 
-### Zwei unabhängige Status je Termin
+Nummerierte Ordner erscheinen in der Hauptnavigation. Einzelheiten zu den
+Feldern: [content-model.md](content-model.md).
 
-1. **Kirby-Status** (Veröffentlichung): *Entwurf* oder *veröffentlicht*.
-2. **Organisatorischer Status** (Feld `orgstatus`): frei, angefragt,
-   reserviert, zur Freigabe, bestätigt, veröffentlicht, abgesagt,
-   geschlossen, archiviert.
+## Zwei unabhängige Status je Termin
 
-Öffentlich sichtbar ist ein Termin nur, wenn **beides** passt
-(`Kneipe\EventStatus::publicKey()`):
+- **Veröffentlicht** (`published`, Grav): Ist die Seite freigeschaltet?
+- **Organisatorischer Status** (`orgstatus`): frei, angefragt, reserviert,
+  zur Freigabe, bestätigt, veröffentlicht, abgesagt, geschlossen, archiviert.
 
-| orgstatus | Terminart | öffentlich als |
-| --- | --- | --- |
-| frei | beliebig | Termin frei |
-| bestätigt, veröffentlicht, archiviert | beliebig außer privat/geschlossen | Termin bestätigt |
-| abgesagt | beliebig | Veranstaltung abgesagt |
-| geschlossen oder Art „geschlossen“/„privat“ | – | Geschlossen (private Feiern ohne Titel und Details) |
-| angefragt, reserviert, zur Freigabe | – | **nicht öffentlich** (404) |
-
-Vergangene Termine (Ende vor jetzt) wechseln automatisch in den Rückblick
-und werden nicht gelöscht.
+Öffentlich erscheint ein Termin nur, wenn er veröffentlicht ist **und** sein
+Status eine öffentliche Entsprechung hat (`EventStatus::publicKey`). Interne
+Status (angefragt, reserviert, zur Freigabe) sind nie öffentlich; private
+Veranstaltungen erscheinen nur als „Geschlossene Gesellschaft“. Nicht
+öffentliche Termine und Teams beantwortet das Plugin mit 404; die
+Admin-Vorschau (signiertes Vorschau-Token von Admin2) zeigt sie gekennzeichnet.
 
 ## Freigabeworkflow
 
-```
-Formular ──► Anfrage (Entwurf unter /anfragen, nie öffentlich)
-               │ Moderation prüft
-               ▼
-            Termin anlegen/ergänzen (Entwurf) ── orgstatus „zur Freigabe“
-               │ Administration prüft
-               ▼
-            Veröffentlichen ──► orgstatus wird „veröffentlicht“
-               │
-               ▼
-     Startseite · Kalender · Teamseite · iCalendar-Feed (automatisch)
-```
+Rollen sind Grav-Gruppen (`user/config/groups.yaml`):
 
-- **Freigabemodus** (Einstellungen, Standard: an): Moderatoren dürfen den
-  Kirby-Status nicht ändern und `bestätigt`/`veröffentlicht` nicht setzen.
-- Durchgesetzt doppelt: Rollenrechte/Blueprint-Optionen **und** Hooks in
-  `site/plugins/kneipe/hooks.php` (greifen auch bei direkten API-Aufrufen).
-- **Doppelbelegung:** Bestätigen/Veröffentlichen ist gesperrt, solange sich
-  der Termin mit einem anderen aktiven Termin überschneidet – außer die
-  Administration lässt die Überschneidung ausdrücklich zu. Das Panel zeigt
-  Überschneidungen am Termin und im Dashboard.
-- **Nachvollziehbarkeit:** Ersteller, letzter Bearbeiter, Zeitpunkte,
-  Änderungsnotiz und ein Änderungsprotokoll (Person, Zeit, geänderte
-  Felder, Veröffentlichung) je Termin.
+- **administration**: `api.pages`, `api.media`, `api.users`, `api.system.read`,
+  `kneipe.admin` – kein technischer Superuser.
+- **moderation**: `api.pages`, `api.media`.
 
-### Hinweis zu Kirby-Hooks
+`Guard.php` prüft **serverseitig** jede Änderung, die über Admin2 bzw. die
+REST-API läuft – unabhängig davon, was die Oberfläche anbietet:
 
-Wirft ein `:before`-Hook eine Ausnahme, setzt Kirby 5.6 seinen internen
-Schutz vor Hook-Endlosschleifen nicht zurück; im selben PHP-Prozess würde
-derselbe Hook danach übersprungen. Das Plugin setzt diesen Zustand vor
-jeder Ablehnung zurück (`$deny` in `hooks.php`). Ein Test prüft
-wiederholte Versuche.
+| Ereignis | Regel |
+| --- | --- |
+| `onAdminSave` (Anlegen, Ändern, Stapel-Veröffentlichen) | Freigabemodus: Moderation darf `published` nicht umschalten (neue Termine starten unveröffentlicht), `orgstatus` nicht auf bestätigt/veröffentlicht setzen, Überschneidungen nicht zulassen; Doppelbelegung blockiert Bestätigen/Veröffentlichen für alle; Seitenart und Seitenrechte ändert nur die Administration; Seiten außer Termin/Team/Meldung ändert nur die Administration; Anfragen bleiben unveröffentlicht und ihre Formularangaben unverändert; Metadaten und Änderungsprotokoll werden gesetzt |
+| `onApiBeforePageDelete` | Moderation löscht nur unveröffentlichte Termine sowie Teams und Meldungen; Anfragen und übrige Seiten nur die Administration |
+| `onApiPageCreated` (Kopie) | Kopien der Moderation starten unveröffentlicht und ohne Freigabestatus; andere Seitenarten darf sie nicht kopieren |
+| `onApiPageMoved` | Termine, Teams, Meldungen bleiben in ihrem Bereich (sonst Rückverschiebung) |
+| `onApiBeforePagesReorder`, `…Reorganize`, `…PageTranslate` | nur Administration |
 
-## Anfragen: Datenschutzabwägung (Variante A)
+Beim Veröffentlichen eines Termins mit Status „zur Freigabe“ oder
+„bestätigt“ wird der Status automatisch „veröffentlicht“. Zusätzlich tragen
+Rechtstexte, Startseite und weitere Seiten der Administration eine
+Seitenregel (`permissions` im Frontmatter), damit Admin2 dort keine
+Bearbeitung anbietet. Übersichtsseiten (Termine, Teams, Aktuelles) tragen
+bewusst keine Seitenregel: Grav vererbt Regeln an Unterseiten ohne eigene
+Regel.
 
-Anfragen werden als **unveröffentlichte Kirby-Seiten** unter `anfragen`
-gespeichert (Variante A) und zusätzlich knapp per E-Mail gemeldet.
+## Anfragen
 
-- Zugriff nur mit persönlichem Panel-Konto (Administration, Moderation).
-  Die Moderation braucht sie laut Workflow zur Prüfung, darf sie aber
-  weder bearbeiten (Formularfelder schreibgeschützt) noch löschen.
-- Keine öffentliche Ansicht: Route `anfragen/*` liefert 404, Templates
-  werfen 404, Vorschau im Panel ist abgeschaltet, Status „veröffentlicht“
-  existiert für Anfragen nicht und wird per Hook verhindert.
-- Automatische Löschung nach der Löschfrist (Standard 180 Tage).
-- Die E-Mail an die Redaktion enthält nur Gruppe, Wunschtermin und den
-  Panel-Link – Vorstellung und Nachricht bleiben im Panel.
-- Nicht im Repository (`.gitignore`), auf dem Server außerhalb des Codes.
-
-Warum nicht nur E-Mail (Variante B)? Anfragen müssten dann in Postfächern
-verwaltet werden, die Löschfrist wäre nicht durchsetzbar und der Status
-der Bearbeitung nicht für alle sichtbar.
-
-## Laufzeitdaten auf dem Server
-
-```
-/var/www/<DOMAIN>/
-├── app/        Programmcode aus Git (nur lesbar für PHP)
-├── data/
-│   ├── content/     Inhalte – gehören dem Panel, werden nie überschrieben
-│   ├── media/       von Kirby erzeugte Bildgrößen
-│   └── storage/     accounts/, sessions/, cache/, logs/, .license
-└── config/kirby.env Geheimnisse (Salt, Cookie-Schlüssel, SMTP)
-```
-
-Die Pfade stellt `site/bootstrap.php` über `KIRBY_CONTENT_ROOT`,
-`KIRBY_MEDIA_ROOT` und `KIRBY_STORAGE_ROOT` ein; lokal gilt die
-Plainkit-Struktur. `content/` aus dem Repository wird nur beim ersten
-Deployment als Startinhalt übernommen.
+Das Formular verarbeitet das Plugin selbst (nicht das Form-Plugin): Nonce
+der Grav-Sitzung, Honeypot, signierte Zeitfalle, Herkunftsprüfung,
+Validierung (`RequestValidator`), Rate-Limit je HMAC der IP-Adresse (keine
+IP im Klartext). Gespeichert wird eine Seite unter `anfragen/` mit
+`published: false`, `routable: false`; der Webserver sperrt zusätzlich
+`/user/pages/anfragen`. Danach E-Mail an die Redaktion (Reply-To = anfragende
+Person, Link in den Admin, keine Formulartexte) und optional eine
+Eingangsbestätigung. Die Löschfrist entfernt Anfragen nach der eingestellten
+Zahl von Tagen.
 
 ## Standardentscheidungen
 
-| Frage | Entscheidung |
-| --- | --- |
-| Kalender-Standardansicht | Liste der kommenden Termine; Monatsraster ab 56em Breite zusätzlich |
-| Freie Termine im iCalendar-Feed | nein – der Feed zeigt, wann geöffnet ist bzw. was abgesagt wurde |
-| Private Veranstaltungen | öffentlich als „Geschlossene Gesellschaft“ ohne Details |
-| Zeitzone iCalendar | UTC (…Z) – kein VTIMEZONE nötig |
-| Rich Text der Redaktion | Writer-Feld (bereinigt beim Speichern) + zweite Bereinigung bei der Ausgabe |
-| KirbyText | nur in Rechtstexten (nur Administration) |
-| Dark Mode | bewusst nicht umgesetzt – warme Markenfarben, weniger Prüfaufwand |
-| Cookies | nur `kirby_session` auf dem Formular (CSRF) und im Panel |
+| Frage | Entscheidung | Grund |
+| --- | --- | --- |
+| Grav 1.7 oder 2.2 | 2.2 mit Admin2 | aktuelle stabile Version; klassischer Admin nur für 1.7 |
+| Anfragen als Flex-Objekte oder Seiten | Seiten | Admin2 bearbeitet Seiten mit Blueprints; keine eigene Oberfläche nötig |
+| Stammdaten in der Konfiguration oder als Seite | Seite „Einstellungen“ | Konfiguration ist im Container schreibgeschützt; Seiten liegen auf dem Volume |
+| Mehrere Pods | nein | Flat Files ohne Sperren über Pods hinweg (Docker.md, Kapitel 17) |
+| Twig in Inhalten | aus | Schutz vor Template-Injection durch Redaktionskonten |

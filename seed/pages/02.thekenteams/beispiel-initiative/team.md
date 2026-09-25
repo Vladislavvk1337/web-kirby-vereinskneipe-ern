@@ -17,4 +17,4 @@ uuid: fd004b4db1ddec95
 published: true
 ---
 
-Beispieltext für eine Initiative. Im Panel durch die echte Vorstellung ersetzen.
+Beispieltext für eine Initiative. Im Admin durch die echte Vorstellung ersetzen.

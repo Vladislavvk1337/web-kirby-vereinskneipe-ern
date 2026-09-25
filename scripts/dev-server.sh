@@ -57,8 +57,9 @@ fi
 
 if [[ -z "$(ls -A "$data/accounts")" ]]; then
   echo "Noch kein Konto vorhanden. Anlegen mit:" >&2
-  echo "  GRAV_DATA_DIR=$data $grav/bin/plugin login new-user -u admin -e admin@example.org -P b --admin-type=api" >&2
-  echo "und im Konto 'groups: [administration]' ergänzen (Docker.md)." >&2
+  echo "  cd $grav && GRAV_DATA_DIR=$data php bin/plugin kneipe user --username=admin \\" >&2
+  echo "    --email=admin@example.org --group=administration --password-stdin" >&2
+  echo "(Passwort über STDIN; Grav-CLI immer im Grav-Verzeichnis ausführen)" >&2
 fi
 
 echo "Grav läuft auf http://localhost:$port (Admin: /admin), Umgebung $GRAV_ENVIRONMENT" >&2
