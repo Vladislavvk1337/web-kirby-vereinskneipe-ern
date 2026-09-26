@@ -1,0 +1,19 @@
+# Absender und SMTP-Zugang kommen aus der Umgebung, z. B.
+#   GRAV_CONFIG__plugins__email__from=noreply@example.org
+#   GRAV_CONFIG__plugins__email__mailer__smtp__password (Secret)
+# Im Container ist der Versand ohne SMTP-Konfiguration abgeschaltet
+# (engine: none), Anfragen werden trotzdem gespeichert.
+enabled: true
+from:
+from_name: 'Ehrenamtskneipe Erndtebrück'
+to:
+mailer:
+  engine: none
+  smtp:
+    server: localhost
+    port: 587
+    encryption: tls
+    user:
+    password:
+content_type: text/plain
+debug: false

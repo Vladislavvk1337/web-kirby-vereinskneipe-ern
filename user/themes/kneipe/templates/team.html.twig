@@ -1,0 +1,62 @@
+{#
+  Thekenteam-Detailseite. Interne Kontaktdaten (contactperson,
+  contactemail, contactphone, internalnote, consentnote) werden bewusst
+  nicht verwendet.
+#}
+{% extends 'partials/base.html.twig' %}
+{% set team = kneipe.teamFor(page) %}
+{% set preview = not team.isPublic %}
+
+{% block content %}
+{% set upcoming = team.upcomingEvents %}
+{% set past = team.pastEvents(10) %}
+<article>
+  {% include 'partials/page-head.html.twig' with {title: team.title, eyebrow: team.typeLabel, back: {url: kneipe.url('/thekenteams'), text: 'Alle Thekenteams'}} %}
+  <div class="container team-detail">
+    <div class="team-detail__main">
+      {% if team.teaser %}<p class="lead">{{ ktext(team.teaser) }}</p>{% endif %}
+      {% if team.cover %}
+      <figure class="team-detail__cover">{% include 'partials/image.html.twig' with {image: team.cover, ratio: 1.5, lazy: false, sizes: '(min-width: 64em) 60vw, 100vw'} %}</figure>
+      {% endif %}
+      {% set text = team.textHtml %}
+      {% if text %}<div class="prose">{{ safe_html(text) }}</div>{% endif %}
+
+      <section class="team-detail__events" aria-labelledby="team-kommend">
+        <h2 id="team-kommend">Kommende Termine</h2>
+        {% if upcoming|length %}
+        <ul class="event-list">
+          {% for event in upcoming %}{% include 'partials/event-item.html.twig' with {event: event} %}{% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">Gerade ist kein Termin mit diesem Team geplant.</p>
+        {% endif %}
+      </section>
+
+      {% if past|length %}
+      <section class="team-detail__events" aria-labelledby="team-vergangen">
+        <h2 id="team-vergangen">Vergangene Termine</h2>
+        <ul class="event-list event-list--compact">
+          {% for event in past %}{% include 'partials/event-item.html.twig' with {event: event} %}{% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% include 'partials/gallery.html.twig' with {images: team.gallery, heading_id: 'team-bilder'} %}
+    </div>
+    <aside class="team-detail__side">
+      {% if team.logo %}
+      <div class="team-detail__logo">{% include 'partials/image.html.twig' with {image: team.logo, width: 200, height: 200} %}</div>
+      {% endif %}
+      {% set links = team.publicLinks %}
+      {% if links|length %}
+      <h2 class="h-small">Mehr über das Team</h2>
+      <ul class="plain-list">
+        {% for link in links %}
+        <li><a class="link-external" href="{{ link.url }}" rel="noopener">{{ link.label }}{{ icon('external') }}<span class="visually-hidden"> (externe Website)</span></a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </aside>
+  </div>
+</article>
+{% endblock %}

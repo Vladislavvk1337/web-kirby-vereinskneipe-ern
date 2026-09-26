@@ -1,0 +1,41 @@
+# Admin2-Formular für Seiten mit Template „confirmation“ (Theme kneipe).
+title: Bestätigung
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Inhalt
+          fields:
+            admin:
+              type: display
+              markdown: true
+              content: Diese Seite bearbeitet nur die **Administration**.
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            header.text:
+              type: textarea
+              label: Bestätigungstext
+              rows: 3
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

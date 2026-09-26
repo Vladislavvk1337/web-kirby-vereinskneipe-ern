@@ -1,25 +1,21 @@
-# Nur, was das Image braucht – Kirby und vendor/ installiert der Build selbst
-.git
-.github
-.env
-.env.*
-!.env.example
-kirby/
-vendor/
-media/*
-site/accounts/
-site/sessions/
-site/cache/
-site/logs/
-site/config/.license
-content/anfragen/_drafts/
-content/**/_changes/
-node_modules/
-tests/
-tools/
-deploy/
-docs/
-*.md
-Dockerfile
-.dockerignore
-.DS_Store
+# Nur was das Image braucht: Dockerfile-Kontext klein und frei von
+# Geheimnissen und Laufzeitdaten halten.
+*
+!docker/
+!scripts/grav-dist.sh
+!scripts/entrypoint.sh
+!scripts/healthcheck.sh
+!setup.php
+!user/config/
+!user/env/
+!user/plugins/kneipe/
+!user/themes/kneipe/
+!seed/pages/
+
+# auch innerhalb der freigegebenen Ordner nie
+**/.DS_Store
+**/.env
+**/.env.*
+user/config/versions.yaml
+user/config/security-private.php
+user/config/plugins/api-private.php

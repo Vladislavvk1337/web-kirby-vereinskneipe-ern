@@ -1,0 +1,6 @@
+# Das Anfrageformular verarbeitet das Plugin „kneipe“ selbst; das Form-Plugin
+# wird nur für Anmeldung und Passwort-Formulare gebraucht.
+enabled: true
+built_in_css: false
+inline_css: false
+client_side_validation: false

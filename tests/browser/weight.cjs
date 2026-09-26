@@ -1,6 +1,6 @@
 /**
  * Übertragungsgröße einer Seite (Ziel Startseite < 800 KB) und Anzahl
- * der Anfragen. Mit Kompression, wie sie Caddy ausliefert (gzip/zstd),
+ * der Anfragen. Mit Kompression, wie sie Apache im Container ausliefert (mod_deflate),
  * ist der Wert kleiner – gemessen wird hier ohne Kompression (PHP-Server).
  *
  *   BASE_URL=http://localhost:8000 NODE_PATH="$(npm root -g)" node tests/browser/weight.cjs [/pfad]

@@ -1,8 +1,0 @@
-# Installiert von deploy/server-setup.sh nach /etc/systemd/system/
-# Terminanfragen nach Ablauf der Löschfrist löschen (Panel → Einstellungen)
-[Unit]
-Description=Löschfrist für Terminanfragen anwenden
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/kneipe-cli cleanup-requests

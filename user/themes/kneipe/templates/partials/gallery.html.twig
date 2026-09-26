@@ -1,0 +1,11 @@
+{# Bildergalerie. Variablen: images, heading_id #}
+{% if images|length %}
+<section class="gallery" aria-labelledby="{{ heading_id }}">
+  <h2 id="{{ heading_id }}">Bilder</h2>
+  <ul class="gallery__list">
+    {% for image in images %}
+    <li>{% include 'partials/image.html.twig' with {image: image, ratio: 1, sizes: '(min-width: 48em) 25vw, 50vw'} %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}

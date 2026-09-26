@@ -1,0 +1,6 @@
+Migration Kirby → Grav vom 25.09.2026 14:16
+Quelle: .
+
+35 Seiten, 6 Dateien übernommen.
+
+Stammdaten und Einstellungen (site.txt) → /einstellungen (nur Administration).

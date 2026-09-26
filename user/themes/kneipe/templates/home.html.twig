@@ -1,0 +1,160 @@
+{#
+  Startseite: Was ist das? Wann ist geöffnet? Wer steht hinter der Theke?
+  Was ist frei? Wie kann man mitmachen? Wo ist das?
+#}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set next = kneipe.nextOpening %}
+{% set next_team = kneipe.nextTeam %}
+{% set upcoming = kneipe.upcomingEvents(3) %}
+{% set free = kneipe.freeEvents(6) %}
+{% set article = kneipe.articles|first %}
+<section class="hero" aria-labelledby="hero-titel">
+  <div class="container hero__inner">
+    <p class="eyebrow">{{ kneipe.name }}</p>
+    <h1 id="hero-titel" class="hero__title">{{ kneipe.claim }}</h1>
+    <p class="lead hero__lead">{{ ktext(page.header.intro ?: kneipe.description) }}</p>
+    <p class="hero__actions">
+      <a class="button button--primary" href="{{ next ? next.url : kneipe.url('/termine') }}">Nächsten Termin ansehen{{ icon('arrow') }}</a>
+    </p>
+  </div>
+  {% include 'partials/landscape.html.twig' %}
+</section>
+
+<section class="next" id="naechster-termin" aria-labelledby="next-titel">
+  <div class="container">
+    <div class="next__card">
+      <h2 id="next-titel" class="next__label">Nächster Öffnungstermin</h2>
+      {% if next %}
+      <p class="next__date">
+        <time datetime="{{ next.startTimestamp|date('c') }}">
+          <span class="next__weekday">{{ kneipe.formatDate(next.startTimestamp, 'EEEE') }}</span>
+          <span class="next__day">{{ kneipe.formatDate(next.startTimestamp, 'd. MMMM') }}</span>
+        </time>
+      </p>
+      <div class="next__details">
+        <p class="next__title"><a href="{{ next.url }}">{{ next.publicTitle }}</a></p>
+        <ul class="facts">
+          <li>{{ icon('clock') }}{{ kneipe.timeRange(next) }}</li>
+          {% if next.doorsTimestamp %}<li>{{ icon('door') }}Einlass {{ next.doorsTimestamp|date('H:i') }} Uhr</li>{% endif %}
+          {% if next.publicTeam %}<li>{{ icon('users') }}Hinter der Theke: {{ next.publicTeam.title }}</li>{% endif %}
+          <li>{% include 'partials/status.html.twig' with {event: next} %}</li>
+        </ul>
+      </div>
+      {% else %}
+      {% include 'partials/empty-state.html.twig' with {
+        title: 'Gerade steht kein Öffnungstermin fest.',
+        text: 'Schaut bald wieder vorbei – oder übernehmt mit eurer Gruppe selbst einen Abend.',
+        link_url: kneipe.url('/termin-anfragen'),
+        link_text: 'Termin anfragen'
+      } %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="upcoming-titel">
+  <div class="container">
+    <div class="section__head">
+      <h2 id="upcoming-titel">Die nächsten Termine</h2>
+      <a class="link-arrow" href="{{ kneipe.url('/termine') }}">Alle Termine{{ icon('arrow') }}</a>
+    </div>
+    {% if upcoming|length %}
+    <ul class="event-list">
+      {% for event in upcoming %}{% include 'partials/event-item.html.twig' with {event: event} %}{% endfor %}
+    </ul>
+    {% else %}
+    {% include 'partials/empty-state.html.twig' with {title: 'Noch keine Termine veröffentlicht.', text: 'Sobald die nächsten Abende feststehen, erscheinen sie hier.'} %}
+    {% endif %}
+  </div>
+</section>
+
+{% if next_team %}
+<section class="section section--team" aria-labelledby="team-titel">
+  <div class="container team-feature">
+    <div class="team-feature__logo">
+      {% if next_team.logo %}
+      {% include 'partials/image.html.twig' with {image: next_team.logo, width: 160, height: 160} %}
+      {% else %}
+      {{ icon('users') }}
+      {% endif %}
+    </div>
+    <div class="team-feature__text">
+      <h2 id="team-titel" class="eyebrow-heading"><span class="eyebrow">Das nächste Thekenteam</span>{{ next_team.title }}</h2>
+      <p class="team-feature__type">{{ next_team.typeLabel }}</p>
+      {% if next_team.teaser %}<p>{{ ktext(next_team.teaser) }}</p>{% endif %}
+      <p><a class="link-arrow" href="{{ next_team.url }}">Das Team kennenlernen{{ icon('arrow') }}</a></p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--free" aria-labelledby="free-titel">
+  <div class="container free">
+    <div class="free__text">
+      <h2 id="free-titel">Noch freie Termine</h2>
+      <p>Diese Abende sind noch zu haben. Eure Gruppe kann einen davon übernehmen – ein Benutzerkonto braucht ihr nicht.</p>
+      <p><a class="button button--primary" href="{{ kneipe.url('/termin-anfragen') }}">Termin anfragen{{ icon('arrow') }}</a></p>
+    </div>
+    {% if free|length %}
+    <ul class="free__list">
+      {% for event in free %}
+      <li><a class="free__slot" href="{{ event.url }}">
+        {{ icon('free') }}
+        <span><strong>{{ kneipe.formatDate(event.startTimestamp, 'EEE, d. MMMM') }}</strong><span class="free__time">{{ kneipe.timeRange(event) }} · Termin frei</span></span>
+      </a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    {% include 'partials/empty-state.html.twig' with {title: 'Aktuell sind keine Termine ausgeschrieben.', text: 'Ihr könnt trotzdem ein Wunschdatum vorschlagen – wir melden uns.'} %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section" aria-labelledby="model-titel">
+  <div class="container">
+    <h2 id="model-titel">{{ page.header.modelheadline ?: 'Gemeinsam einen Abend gestalten' }}</h2>
+    <ol class="steps">
+      {% for step in page.header.modelsteps ?? [] %}
+      <li class="steps__item">
+        <h3>{{ step.title }}</h3>
+        <p>{{ ktext(step.text) }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+{% set photo = kneipe.image(page, page.header.photo) %}
+{% if photo %}
+<section class="photo" aria-label="Bild aus der Kneipe">
+  <figure class="photo__figure">
+    {% include 'partials/image.html.twig' with {image: photo, ratio: 16 / 7, sizes: '100vw', class: 'photo__image'} %}
+    {% if page.header.photocaption %}
+    <figcaption class="container photo__caption">{{ ktext(page.header.photocaption) }}</figcaption>
+    {% endif %}
+  </figure>
+</section>
+{% endif %}
+
+<section class="section section--join" aria-labelledby="join-titel">
+  <div class="container join">
+    <h2 id="join-titel">{{ page.header.joinheadline ?: 'Ihr möchtet eine Thekenschicht übernehmen?' }}</h2>
+    <p class="lead">{{ ktext(page.header.jointext) }}</p>
+    <p><a class="button button--primary" href="{{ kneipe.url('/mitmachen') }}">So könnt ihr mitmachen{{ icon('arrow') }}</a></p>
+  </div>
+</section>
+
+{% if article %}
+<section class="section" aria-labelledby="news-titel">
+  <div class="container">
+    <div class="section__head">
+      <h2 id="news-titel">Aktuelles</h2>
+      <a class="link-arrow" href="{{ kneipe.url('/aktuelles') }}">Alle Meldungen und Rückblicke{{ icon('arrow') }}</a>
+    </div>
+    {% include 'partials/article-teaser.html.twig' with {article: article, level: 3} %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

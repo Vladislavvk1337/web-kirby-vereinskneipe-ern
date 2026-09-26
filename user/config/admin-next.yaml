@@ -1,0 +1,5 @@
+# Voreinstellungen der Admin-Oberfläche (Admin2) für alle Konten. Jede Person
+# kann Sprache und Darstellung im Admin für sich ändern (gespeichert im Konto).
+ui:
+  defaults:
+    adminLanguage: de

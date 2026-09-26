@@ -1,11 +1,13 @@
 <?php
 
 /**
- * Testlauf: php tests/run.php [--unit] [--integration] [--http] [--filter=text]
+ * Testlauf: php tests/run.php [--unit] [--http] [--filter=text]
  *
- * Ohne Auswahl laufen alle Gruppen. Unit-Tests brauchen nur PHP,
- * Integrations- und HTTP-Tests zusätzlich Kirby (composer install).
- * Alle Tests arbeiten mit einer Kopie von content/ in tests/tmp/.
+ * Ohne Auswahl laufen alle Gruppen. Unit-Tests brauchen nur PHP (einige
+ * zusätzlich symfony/yaml aus dem Grav-Kern). HTTP-Tests bauen eine eigene
+ * Grav-Testinstanz unter tests/tmp/ (Grav-Paket aus .grav/dist bzw.
+ * Download) mit den Beispielinhalten aus seed/ und prüfen Website,
+ * Formular und Admin-API (Freigabeworkflow).
  */
 
 error_reporting(E_ALL);
@@ -30,12 +32,12 @@ $groups  = [];
 foreach ($args as $arg) {
 	if (str_starts_with($arg, '--filter=')) {
 		$filter = substr($arg, 9);
-	} elseif (in_array($arg, ['--unit', '--integration', '--http'], true)) {
+	} elseif (in_array($arg, ['--unit', '--http'], true)) {
 		$groups[] = substr($arg, 2);
 	}
 }
 
-$groups = $groups ?: ['unit', 'integration', 'http'];
+$groups = $groups ?: ['unit', 'http'];
 $failed = 0;
 $passed = 0;
 $start  = microtime(true);
@@ -44,9 +46,8 @@ foreach ($groups as $group) {
 	$files = glob(__DIR__ . '/' . $group . '/*.php') ?: [];
 	sort($files);
 
-	if ($group !== 'unit' && is_file($root . '/kirby/bootstrap.php') === false) {
-		echo "⚠ Gruppe $group übersprungen: Kirby fehlt (composer install)\n";
-		continue;
+	if ($group === 'http') {
+		require_once __DIR__ . '/support/http.php';
 	}
 
 	echo "\n== " . ucfirst($group) . "\n";

@@ -1,0 +1,50 @@
+name: Kneipe
+slug: kneipe
+type: plugin
+version: 1.0.0
+description: 'Termine, Freigabeworkflow, Anfrageformular, iCalendar und Redaktionsübersicht der Ehrenamtskneipe Erndtebrück'
+icon: calendar
+author:
+  name: 'Ehrenamtskneipe Erndtebrück'
+license: proprietary
+dependencies:
+  - { name: grav, version: '>=2.2.0' }
+  - { name: api, version: '>=1.0.40' }
+  - { name: email, version: '>=5.0.0' }
+
+form:
+  validation: strict
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin aktiv
+      highlight: 1
+      default: 1
+      options:
+        1: Ja
+        0: Nein
+      validate:
+        type: bool
+    requests.rate_limit:
+      type: number
+      label: 'Anfragen je IP und Stunde'
+      default: 5
+      validate:
+        min: 1
+        max: 1000
+    requests.min_seconds:
+      type: number
+      label: 'Zeitfalle (Sekunden)'
+      default: 3
+      validate:
+        min: 0
+        max: 600
+    noindex:
+      type: toggle
+      label: 'Suchmaschinen aussperren'
+      default: 0
+      options:
+        1: Ja
+        0: Nein
+      validate:
+        type: bool

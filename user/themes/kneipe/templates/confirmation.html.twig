@@ -1,0 +1,17 @@
+{# Bestätigung nach dem Absenden (Post/Redirect/Get), nicht indexiert #}
+{% extends 'partials/base.html.twig' %}
+{% set noindex = true %}
+
+{% block content %}
+{% include 'partials/page-head.html.twig' with {title: page.title, eyebrow: 'Anfrage gesendet'} %}
+<div class="container container--narrow section">
+  <div class="notice notice--success" role="status">{{ icon('check') }}<p>{{ ktext(page.header.text ?: 'Danke! Eure Anfrage ist bei uns angekommen.') }}</p></div>
+  <h2>Wie geht es weiter?</h2>
+  <ol class="plain-steps">
+    <li>Die Redaktion prüft eure Anfrage.</li>
+    <li>Wir melden uns per E-Mail oder Telefon bei euch.</li>
+    <li>Wenn alles passt, erscheint der Abend im Kalender – mit eurem Namen, wenn ihr zustimmt.</li>
+  </ol>
+  <p><a class="link-arrow" href="{{ kneipe.url('/termine') }}">Zurück zum Kalender{{ icon('arrow') }}</a></p>
+</div>
+{% endblock %}

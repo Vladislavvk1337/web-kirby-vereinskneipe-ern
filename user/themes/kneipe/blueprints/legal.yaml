@@ -1,0 +1,57 @@
+# Admin2-Formular für Seiten mit Template „legal“ (Theme kneipe).
+title: Rechtstext
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Inhalt
+          fields:
+            admin:
+              type: display
+              markdown: true
+              content: 'Nur die **Administration** bearbeitet Rechtstexte. Stammdaten fügt ihr mit `(stammdaten: street)` ein – verfügbar: name, operator, representative, street, postalcode, city, address, email, phone, register, responsible, hoster, mailprovider, retention. Fehlende Angaben erscheinen markiert.'
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            header.draftnote:
+              type: toggle
+              label: Hinweis „Entwurf – noch nicht rechtlich geprüft“ anzeigen
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.reviewed:
+              type: datetime
+              label: Zuletzt rechtlich geprüft am
+              format: Y-m-d
+            content:
+              type: markdown
+              label: Text
+              validate:
+                type: textarea
+                max: 0
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              default: 1
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

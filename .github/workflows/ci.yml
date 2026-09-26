@@ -1,8 +1,8 @@
 name: Prüfung
 
-# Prüft jeden Push und Pull Request: PHP-Syntax, Unit-, Integrations- und
-# HTTP-Tests, Shell-Skripte und das Caddyfile. So fällt ein Fehler auf,
-# bevor der Server ihn beim nächsten Update-Lauf bemerkt.
+# Prüft jeden Push und Pull Request: PHP-Syntax, Unit- und HTTP-Tests
+# (eigene Grav-Testinstanz inkl. Admin-API/Freigabeworkflow), Shell-Skripte,
+# Dockerfile und Kubernetes-Manifeste.
 
 on:
   push:
@@ -26,32 +26,59 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: gd, intl, mbstring, curl, dom, zip
-          tools: composer
+          extensions: gd, intl, mbstring, curl, dom, zip, exif
           coverage: none
 
-      - run: composer install --no-interaction --no-progress --prefer-dist
-      - run: composer lint
-      - run: composer test
+      - name: Grav-Paket zwischenspeichern
+        uses: actions/cache@v4
+        with:
+          path: .grav/dist
+          key: grav-dist-${{ hashFiles('scripts/grav-dist.sh') }}
 
-  scripts:
-    name: Deploy-Skripte und Caddyfile
+      - name: PHP-Syntax
+        run: find setup.php user tools tests -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Grav für Tests vorbereiten
+        run: scripts/dev-server.sh --prepare-only
+
+      - name: Tests
+        run: php tests/run.php
+
+  manifests:
+    name: Skripte, Dockerfile, Kubernetes
     runs-on: ubuntu-latest
+    env:
+      KUSTOMIZE: '5.7.1'
+      KUBECONFORM: '0.7.0'
+      KUBE_LINTER: '0.7.6'
+      HADOLINT: '2.14.0'
     steps:
       - uses: actions/checkout@v4
 
+      - name: Werkzeuge
+        run: |
+          mkdir -p "$HOME/bin" && cd "$HOME/bin"
+          curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE}/kustomize_v${KUSTOMIZE}_linux_amd64.tar.gz" | tar xz
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/v${KUBECONFORM}/kubeconform-linux-amd64.tar.gz" | tar xz
+          curl -fsSL "https://github.com/stackrox/kube-linter/releases/download/v${KUBE_LINTER}/kube-linter-linux.tar.gz" | tar xz
+          curl -fsSL -o hadolint "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT}/hadolint-linux-x86_64" && chmod +x hadolint
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
       - name: Bash-Syntax und ShellCheck
         run: |
-          for f in deploy/*.sh docker/*.sh; do bash -n "$f"; done
-          shellcheck -x -S warning deploy/*.sh docker/*.sh
+          for f in scripts/*.sh; do bash -n "$f"; done
+          shellcheck -x -S warning scripts/*.sh
 
-      - name: Caddyfile prüfen
+      - name: Dockerfile (hadolint)
+        run: hadolint Dockerfile
+
+      - name: Kustomize-Overlays bauen und prüfen
         run: |
-          curl -fsSL "https://github.com/caddyserver/caddy/releases/download/v2.10.2/caddy_2.10.2_linux_amd64.tar.gz" | tar xz caddy
-          sed -e 's#{{ACME_EMAIL}}#ci@example.org#; s#{{APP_DIR}}#/tmp/app#g; s#{{DATA_DIR}}#/tmp/data#g; s#{{KIRBY_SOCKET}}#/tmp/php.sock#g; s#/var/log/caddy/#/tmp/#g' deploy/caddy/Caddyfile > Caddyfile.ci
-          for phase in preview live; do
-            cp Caddyfile.ci "Caddyfile.$phase"
-            if [ "$phase" = preview ]; then cat deploy/caddy/preview.caddy; else cat deploy/caddy/live.caddy deploy/caddy/preview-redirect.caddy; fi \
-              | sed -e 's#{{PREVIEW_HOST}}#labs.example.org#; s#{{LIVE_HOST}}#www.example.org#g; s#{{DOMAIN}}#example.org#' >> "Caddyfile.$phase"
-            ./caddy validate --config "Caddyfile.$phase" --adapter caddyfile
+          for env in dev staging production; do
+            kustomize build "k8s/overlays/$env" > "/tmp/$env.yaml"
+            kubeconform -strict -summary -kubernetes-version 1.33.0 "/tmp/$env.yaml"
+            kube-linter lint "/tmp/$env.yaml"
           done
+          kubeconform -strict -summary k8s/base/secret.example.yaml
+          # Die Vorlage enthält nur Platzhalter
+          ! grep -E '^\s+[A-Za-z_]+: "[^<"]' k8s/base/secret.example.yaml | grep -v 'KNEIPE_ADMIN_USERNAME'

@@ -1,0 +1,23 @@
+# Admin2-Formular für Seiten mit Template „requests“ (Theme kneipe).
+title: Anfragen (Ordner)
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Anfragen
+          fields:
+            info:
+              type: display
+              markdown: true
+              content: Hier landen die Terminanfragen aus dem Formular. Sie sind **nie öffentlich** und werden nach Ablauf der Löschfrist automatisch gelöscht (Einstellungen). Die Übersicht offener Anfragen findet ihr unter **Redaktion**.
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true

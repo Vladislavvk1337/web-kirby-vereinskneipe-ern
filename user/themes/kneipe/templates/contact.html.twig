@@ -1,0 +1,53 @@
+{# Kontakt und Anfahrt – Kartenlink statt eingebetteter Karte #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set hours = kneipe.settingRows('openinghours') %}
+{% include 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+<div class="container section contact">
+  <section class="contact__card" aria-labelledby="adresse-titel">
+    <h2 id="adresse-titel">Adresse</h2>
+    <address>
+      <strong>{{ kneipe.setting('venue', kneipe.name) }}</strong><br>
+      {% if kneipe.setting('street') %}{{ kneipe.setting('street') }}{% else %}<mark class="placeholder">[Straße und Hausnummer]</mark>{% endif %}<br>
+      {% if kneipe.setting('postalcode') %}{{ kneipe.setting('postalcode') }}{% else %}<mark class="placeholder">[PLZ]</mark>{% endif %} {{ kneipe.setting('city', 'Erndtebrück') }}
+    </address>
+    {% if kneipe.mapUrl %}
+    <p><a class="button button--secondary" href="{{ kneipe.mapUrl }}" rel="noopener">{{ icon('pin') }}Auf der Karte ansehen<span class="visually-hidden"> (OpenStreetMap, externe Website)</span></a></p>
+    <p class="muted small">Der Link führt zu OpenStreetMap. Erst beim Anklicken werden Daten an OpenStreetMap übertragen.</p>
+    {% endif %}
+  </section>
+
+  <section class="contact__card" aria-labelledby="kontakt-titel">
+    <h2 id="kontakt-titel">So erreicht ihr uns</h2>
+    <dl class="fact-list">
+      <div><dt>{{ icon('mail') }}E-Mail</dt><dd>{% include 'partials/email.html.twig' %}</dd></div>
+      <div><dt>{{ icon('phone') }}Telefon</dt><dd>{% include 'partials/phone.html.twig' %}</dd></div>
+    </dl>
+    <p>Für Thekenschichten nutzt am besten das Formular:</p>
+    <p><a class="button button--primary" href="{{ kneipe.url('/termin-anfragen') }}">Termin anfragen{{ icon('arrow') }}</a></p>
+  </section>
+
+  <section class="contact__card" aria-labelledby="zeiten-titel">
+    <h2 id="zeiten-titel">Öffnungszeiten</h2>
+    {% if hours|length %}
+    <dl class="hours">
+      {% for row in hours %}
+      <div><dt>{{ ktext(row.days) }}</dt><dd>{{ ktext(row.time) }}{% if row.note %}<br><span class="hours__note">{{ ktext(row.note) }}</span>{% endif %}</dd></div>
+      {% endfor %}
+    </dl>
+    {% endif %}
+    {% if kneipe.setting('openingnote') %}<p>{{ ktext(kneipe.setting('openingnote')) }}</p>{% endif %}
+    <p><a class="link-arrow" href="{{ kneipe.url('/termine') }}">Zum Kalender{{ icon('arrow') }}</a></p>
+  </section>
+
+  <section class="contact__wide" aria-labelledby="anfahrt-titel">
+    <h2 id="anfahrt-titel">Anfahrt</h2>
+    <div class="prose">{{ safe_html(page.content) }}</div>
+    {% if page.header.accessibility %}
+    <h3>Zugang</h3>
+    <p>{{ ktext(page.header.accessibility) }}</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

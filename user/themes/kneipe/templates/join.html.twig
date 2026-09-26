@@ -1,0 +1,47 @@
+{# Mitmachen: Ablauf, Einzelpersonen, häufige Fragen #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set free = kneipe.freeEvents(4) %}
+{% include 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+<div class="container section">
+  <section aria-labelledby="ablauf-titel">
+    <h2 id="ablauf-titel">So läuft es ab</h2>
+    <ol class="steps steps--four">
+      {% for step in page.header.steps ?? [] %}
+      <li class="steps__item">
+        <h3>{{ step.title }}</h3>
+        <p>{{ ktext(step.text) }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="join__action"><a class="button button--primary" href="{{ kneipe.url('/termin-anfragen') }}">Freien Termin anfragen{{ icon('arrow') }}</a></p>
+    {% if free|length %}
+    <p class="muted">Als Nächstes frei:
+      {% for event in free %}{{ loop.first ? '' : ', ' }}<a href="{{ event.url }}">{{ kneipe.formatDate(event.startTimestamp, 'EEE, d. MMMM') }}</a>{% endfor %}
+    </p>
+    {% endif %}
+  </section>
+
+  {% if page.header.helpers %}
+  <section class="section" aria-labelledby="einzeln-titel">
+    <h2 id="einzeln-titel">Einzeln helfen</h2>
+    <div class="prose">{{ richtext(page.header.helpers) }}</div>
+  </section>
+  {% endif %}
+
+  {% if page.header.faq ?? [] %}
+  <section class="section" aria-labelledby="faq-titel">
+    <h2 id="faq-titel">Häufige Fragen</h2>
+    <div class="faq">
+      {% for item in page.header.faq %}
+      <details class="faq__item">
+        <summary>{{ item.question }}</summary>
+        <p>{{ ktext(item.answer) }}</p>
+      </details>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

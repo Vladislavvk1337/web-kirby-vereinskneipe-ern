@@ -1,13 +1,18 @@
 name: Container-Image
 
-# Baut das Image bei jedem Push und Pull Request, startet es mit einem
-# Volume und prüft Seiten, Sperren, Header und Health-Checks. Auf main wird
-# das geprüfte Image nach ghcr.io veröffentlicht (Tags: latest, sha-<kurz>).
+# Baut das Image bei jedem Push und Pull Request, startet es wie im Cluster
+# (schreibgeschützt, ohne Capabilities, als UID 33) und prüft Seiten,
+# Sperren, Header, Health-Checks und die Admin-API. Veröffentlicht nach
+# ghcr.io:
+#   main   → latest, main, sha-<commit>
+#   dev    → dev, sha-<commit>
+#   v1.2.3 → 1.2.3, 1.2   (Produktion, k8s/overlays/production)
 # Dokumentation: Docker.md
 
 on:
   push:
     branches: [main, dev]
+    tags: ['v*.*.*']
   pull_request:
   workflow_dispatch:
 
@@ -30,12 +35,28 @@ jobs:
       - name: Image-Namen (Kleinbuchstaben)
         run: echo "IMAGE=${IMAGE,,}" >> "$GITHUB_ENV"
 
+      - name: Metadaten
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
       - name: Bauen
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
           tags: kneipe-web:test
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            CREATED=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -43,12 +64,14 @@ jobs:
         run: |
           set -euo pipefail
           docker volume create kneipe-data
-          docker run -d --name kneipe --read-only --tmpfs /tmp:uid=33,gid=33 \
-            -v kneipe-data:/data -p 8080:8080 \
-            -e KIRBY_URL=http://localhost:8080 \
-            -e KIRBY_CONTENT_SALT="$(openssl rand -hex 32)" \
-            -e KIRBY_COOKIE_KEY="$(openssl rand -hex 32)" \
-            -e KIRBY_MAIL_TRANSPORT=none \
+          docker run -d --name kneipe -p 8080:8080 \
+            --read-only --tmpfs /tmp:uid=33,gid=33 --cap-drop ALL --security-opt no-new-privileges \
+            -v kneipe-data:/data \
+            -e GRAV_CONFIG__system__custom_base_url=http://localhost:8080 \
+            -e GRAV_CONFIG__plugins__email__mailer__engine=none \
+            -e GRAV_NONCE_KEY="$(openssl rand -hex 32)" \
+            -e GRAV_API_JWT_SECRET="$(openssl rand -hex 32)" \
+            -e KNEIPE_ADMIN_USERNAME=admin \
             -e KNEIPE_ADMIN_EMAIL=admin@example.org \
             -e KNEIPE_ADMIN_PASSWORD=ci-test-passwort-123 \
             kneipe-web:test
@@ -56,7 +79,7 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://localhost:8080/readyz && break; sleep 1; done
 
           check() {
-            code="$(curl -sL --max-redirs 5 -o /dev/null -w '%{http_code}' "http://localhost:8080$1")"
+            code="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$1")"
             echo "$1 → $code (erwartet $2)"
             [ "$code" = "$2" ] || { docker logs kneipe; exit 1; }
           }
@@ -71,45 +94,92 @@ jobs:
           check /termin-anfragen 200
           check /thekenteams 200
           check /kontakt 200
-          check /panel/login 200
+          check /admin 200
           check /sitemap.xml 200
+          check /robots.txt 200
           check /gibt-es-nicht 404
           check /anfragen 404
-          check /content/site.txt 404
+          check /einstellungen 404
+          check /termine/demo-reserviert 404
           check /.env 404
+          check /user/config/system.yaml 404
+          check /user/accounts/admin.yaml 404
+          check /user/pages/impressum/legal.md 404
+          check /user/pages/anfragen/requests.md 404
 
-          for path in /site/config/config.php /kirby/bootstrap.php /vendor/autoload.php; do
+          for path in /setup.php /vendor/autoload.php /system/defines.php /bin/grav /composer.json; do
             code="$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:8080$path")"
             echo "$path → $code (gesperrt)"
             case "$code" in 403|404) ;; *) exit 1 ;; esac
           done
 
-          curl -sI http://localhost:8080/ | grep -qi '^content-security-policy: default-src' 
-          curl -sI http://localhost:8080/panel/login | grep -qi "unsafe-inline"
-          curl -s http://localhost:8080/ | grep -q 'Nächster Öffnungstermin'
+          # (Antworten erst speichern – grep -q mit pipefail bricht sonst curl ab)
+          home_headers="$(curl -sI http://localhost:8080/)"
+          admin_headers="$(curl -sI http://localhost:8080/admin)"
+          home="$(curl -s http://localhost:8080/)"
+          grep -qi "^content-security-policy: default-src 'self'; script-src 'self';" <<< "$home_headers"
+          ! grep -qi '^set-cookie' <<< "$home_headers"
+          grep -qi "unsafe-inline" <<< "$admin_headers"
+          grep -q 'Nächster Öffnungstermin' <<< "$home"
 
-          # Vorschaubild wird von Kirby erzeugt und aus /data/media ausgeliefert
-          img="$(curl -s http://localhost:8080/ | grep -o 'http://localhost:8080/media/[^" ]*\.webp' | head -1)"
-          [ -n "$img" ] && curl -fsS -o /dev/null "$img"
+          # Bildvariante wird erzeugt (gd) und ausgeliefert
+          img="$(grep -o '/images/[^" ]*\.jpg' <<< "$home" | head -1)"
+          [ -n "$img" ] && curl -fsS -o /dev/null "http://localhost:8080$img"
+
+          # Admin-API: Anmeldung und Redaktionsübersicht
+          token="$(curl -fsS -X POST http://localhost:8080/api/v1/auth/token -H 'Content-Type: application/json' \
+            -d '{"username":"admin","password":"ci-test-passwort-123"}' | python3 -c 'import sys,json; print(json.load(sys.stdin)["data"]["access_token"])')"
+          curl -fsS -o /dev/null -H "Authorization: Bearer $token" http://localhost:8080/api/v1/kneipe/overview
 
           [ "$(docker exec kneipe id -u)" = "33" ]
-          docker exec kneipe php -m | grep -qi '^intl$'
-          docker exec kneipe php -m | grep -qi '^gd$'
-          docker logs kneipe 2>&1 | grep -q 'Erster Administrator angelegt'
+          modules="$(docker exec kneipe php -m)"
+          grep -qix 'intl' <<< "$modules"
+          grep -qix 'gd' <<< "$modules"
+          grep -q 'Erstes Administrationskonto admin angelegt' <<< "$(docker logs kneipe 2>&1)"
           # keine PHP-Warnungen oder -Fehler im Protokoll
-          ! docker logs kneipe 2>&1 | grep -E 'PHP (Warning|Fatal|Parse|Notice|Deprecated)'
+          logs="$(docker logs kneipe 2>&1)"
+          ! grep -E 'PHP (Warning|Fatal|Parse|Notice|Deprecated)|grav\.(ERROR|CRITICAL)' <<< "$logs"
 
-          # Wartung als eigener Aufruf (z. B. Kubernetes-CronJob)
-          docker run --rm -v kneipe-data:/data \
-            -e KIRBY_URL=http://localhost:8080 \
-            -e KIRBY_CONTENT_SALT="$(openssl rand -hex 32)" -e KIRBY_COOKIE_KEY="$(openssl rand -hex 32)" \
-            kneipe-web:test php bin/cleanup-requests.php
+          # Wartung als eigener Aufruf
+          docker exec kneipe php bin/plugin kneipe maintenance
 
-          # Ohne Geheimnisse darf das Image nicht starten
+          # Neustart: Inhalte und Konten bleiben, Beispielinhalte werden nicht erneut kopiert
+          docker restart kneipe
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/readyz && break; sleep 1; done
+          [ "$(docker logs kneipe 2>&1 | grep -c 'Beispielinhalte')" = "1" ]
+
+          # Staging/Produktion ohne Konto und ohne Basis-URL starten nicht
           ! docker run --rm kneipe-web:test
+          ! docker run --rm -e GRAV_CONFIG__system__custom_base_url=https://example.org kneipe-web:test
+
+          # Alte Kirby-Umgebung: KIRBY_*-Variablen werden mit Nachfolger genannt,
+          # ohne Werte; das Erstkonto heißt ohne Benutzernamen „admin“
+          docker run -d --name kneipe-alt -p 8081:8080 --read-only --tmpfs /tmp:uid=33,gid=33 --tmpfs /data:uid=33,gid=33 \
+            -e GRAV_CONFIG__system__custom_base_url=http://localhost:8081 \
+            -e KIRBY_URL=http://localhost:8081 -e KIRBY_CONTENT_SALT=wert-salz-ci -e KIRBY_SMTP_PASSWORD=wert-smtp-ci \
+            -e KNEIPE_ADMIN_EMAIL=admin@example.org -e KNEIPE_ADMIN_PASSWORD=ci-test-passwort-123 \
+            kneipe-web:test
+          for i in $(seq 1 30); do curl -fsS http://localhost:8081/readyz && break; sleep 1; done
+          logs="$(docker logs kneipe-alt 2>&1)"
+          grep -q 'KIRBY_URL → GRAV_CONFIG__system__custom_base_url' <<< "$logs"
+          grep -q 'Erstes Administrationskonto admin angelegt' <<< "$logs"
+          ! grep -q 'wert-' <<< "$logs"
+          ! grep -q 'KIRBY_CONTENT_SALT fehlt' <<< "$logs"
+          curl -fsS -o /dev/null -X POST http://localhost:8081/api/v1/auth/token -H 'Content-Type: application/json' \
+            -d '{"username":"admin","password":"ci-test-passwort-123"}'
+          docker rm -f kneipe-alt
+
+      - name: Schwachstellen-Scan (Trivy)
+        env:
+          TRIVY: '0.74.0'
+        run: |
+          curl -fsSL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY}/trivy_${TRIVY}_Linux-64bit.tar.gz" | tar xz trivy
+          # Bericht über alles, Abbruch bei behebbaren HIGH/CRITICAL (Ausnahmen: .trivyignore)
+          ./trivy image --scanners vuln,secret --severity MEDIUM,HIGH,CRITICAL --no-progress kneipe-web:test
+          ./trivy image --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 --no-progress kneipe-web:test
 
       - name: Anmelden bei ghcr.io
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -117,14 +187,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Veröffentlichen
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: |
-            ${{ env.IMAGE }}:latest
-            ${{ env.IMAGE }}:sha-${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            REVISION=${{ github.sha }}
+            CREATED=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
           cache-from: type=gha
-          labels: |
-            org.opencontainers.image.revision=${{ github.sha }}

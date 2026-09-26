@@ -1,0 +1,21 @@
+{#
+  Termin in einer Liste. Die ganze Zeile ist anklickbar, der Link liegt auf
+  der Überschrift. Variablen: event, level (Überschriftenebene, Standard 3)
+#}
+{% set level = level ?? 3 %}
+{% set team = event.publicTeam %}
+<li class="event-item event-item--{{ event.publicStatus }}{{ event.isPast ? ' event-item--past' : '' }}">
+  {% include 'partials/date-tile.html.twig' with {event: event} %}
+  <div class="event-item__body">
+    <h{{ level }} class="event-item__title"><a href="{{ event.url }}">{{ event.publicTitle }}</a></h{{ level }}>
+    <p class="event-item__meta">
+      <span>{{ icon('clock') }}{{ kneipe.timeRange(event) }}</span>
+      {% if team %}
+      <span>{{ icon('users') }}{{ team.title }}</span>
+      {% elseif not event.isPrivateEvent %}
+      <span class="event-item__type">{{ event.eventTypeLabel }}</span>
+      {% endif %}
+    </p>
+  </div>
+  <div class="event-item__status">{% include 'partials/status.html.twig' with {event: event} %}</div>
+</li>

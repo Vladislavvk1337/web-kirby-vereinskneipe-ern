@@ -1,0 +1,166 @@
+{#
+  Kalender: Liste (Standard, mobil) und Monatsansicht (größere Bildschirme),
+  Filter, Monats- und Jahresnavigation, Rückblick. Daten: CalendarView
+  (Plugin) als Variable `calendar`.
+#}
+{% extends 'partials/base.html.twig' %}
+{% set styles = ['calendar'] %}
+{% set noindex = calendar.noindex %}
+{% set canonical = kneipe.absoluteUrl(page.url) %}
+
+{% block content %}
+{% set f = calendar.filters %}
+{% embed 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+  {% block slot %}
+  <p class="page-head__links">
+    <a class="link-inline" href="{{ kneipe.url('/termine.ics') }}">{{ icon('calendar') }}Kalender abonnieren (iCalendar)</a>
+    <a class="link-inline" href="{{ kneipe.url('/termin-anfragen') }}">{{ icon('free') }}Freien Termin anfragen</a>
+  </p>
+  {% endblock %}
+{% endembed %}
+
+<div class="container calendar" id="kalender">
+  <div class="calendar__tools">
+    <form class="filters" method="get" action="{{ page.url }}" aria-labelledby="filter-titel">
+      <h2 class="filters__title" id="filter-titel">Termine filtern</h2>
+      {% for keep in ['jahr', 'monat', 'zeitraum'] %}{% if f[keep] %}<input type="hidden" name="{{ keep }}" value="{{ f[keep] }}">{% endif %}{% endfor %}
+      <div class="filters__field">
+        <label for="filter-art">Terminart</label>
+        <select id="filter-art" name="art">
+          <option value="">Alle Terminarten</option>
+          {% for key, label in calendar.categories %}
+          <option value="{{ key }}"{% if f.art == key %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filters__field">
+        <label for="filter-verfuegbarkeit">Verfügbarkeit</label>
+        <select id="filter-verfuegbarkeit" name="verfuegbarkeit">
+          {% for key, label in calendar.availability %}
+          <option value="{{ key }}"{% if f.verfuegbarkeit == key %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filters__actions">
+        <button class="button button--secondary" type="submit">Filter anwenden</button>
+        {% if calendar.active %}<a class="button button--quiet" href="{{ page.url }}">Filter zurücksetzen</a>{% endif %}
+      </div>
+    </form>
+    <details class="calendar__jump"{% if f.monat %} open{% endif %}>
+      <summary>Zu Monat und Jahr springen</summary>
+      <form class="jump" method="get" action="{{ page.url }}">
+        {% for keep in ['art', 'verfuegbarkeit'] %}{% if f[keep] %}<input type="hidden" name="{{ keep }}" value="{{ f[keep] }}">{% endif %}{% endfor %}
+        <div class="filters__field">
+          <label for="jump-monat">Monat</label>
+          <select id="jump-monat" name="monat">
+            {% for num, label in calendar.months %}
+            <option value="{{ num }}"{% if num == calendar.month %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filters__field">
+          <label for="jump-jahr">Jahr</label>
+          <select id="jump-jahr" name="jahr">
+            {% for y in calendar.years %}
+            <option value="{{ y }}"{% if y == calendar.year %} selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filters__actions">
+          <button class="button button--secondary" type="submit">Monat anzeigen</button>
+        </div>
+      </form>
+    </details>
+  </div>
+
+  {% if f.zeitraum != 'vergangen' %}
+  <section class="calendar__month" aria-labelledby="monat-titel">
+    <h2 id="monat-titel" class="visually-hidden">Monatsansicht</h2>
+    <nav class="month-nav" aria-label="Monat wechseln">
+      {% for step in calendar.nav|slice(0, 2) %}
+      <a class="month-nav__step" href="{{ step.url }}">{{ icon(step.icon) }}<span class="visually-hidden">{{ step.label }}</span></a>
+      {% endfor %}
+      <p class="month-nav__current" aria-live="polite">{{ calendar.monthLabel }}</p>
+      {% for step in calendar.nav|slice(2, 2) %}
+      <a class="month-nav__step" href="{{ step.url }}"><span class="visually-hidden">{{ step.label }}</span>{{ icon(step.icon) }}</a>
+      {% endfor %}
+    </nav>
+    <div class="month-grid" id="monatsansicht">
+      <table>
+        <caption class="visually-hidden">Monatsübersicht {{ calendar.monthLabel }} – alle Termine stehen auch in der Liste unter der Tabelle.</caption>
+        <thead>
+          <tr>
+            {% for day in calendar.weekdays %}
+            <th scope="col"><abbr title="{{ day[1] }}">{{ day[0] }}</abbr></th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in calendar.weeks %}
+          <tr>
+            {% for day in week %}
+            <td class="{{ day.class }}">
+              <span class="month-grid__date">{{ day.day }}{% if day.today %}<span class="visually-hidden"> (heute)</span>{% endif %}</span>
+              {% if day.events|length %}
+              <ul>
+                {% for item in day.events %}
+                {% set e = item.entry %}
+                <li class="month-grid__event month-grid__event--{{ e.publicStatus }}">
+                  <a href="{{ e.url }}">
+                    {% if not e.isAllDay %}<span class="month-grid__time">{{ e.startTimestamp|date('H:i') }}</span>{% endif %}
+                    <span class="month-grid__title">{{ e.publicTitle }}</span>
+                    {% if item.flag %}<span class="month-grid__flag">({{ item.flag }})</span>{% endif %}
+                  </a>
+                </li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="calendar__list" aria-labelledby="liste-titel">
+    <h2 id="liste-titel">{{ calendar.listTitle }}</h2>
+    {% if calendar.active %}
+    <p class="calendar__count" role="status">{{ calendar.listCount }} {{ calendar.listCount == 1 ? 'Termin' : 'Termine' }} mit den gewählten Filtern.</p>
+    {% endif %}
+
+    {% if calendar.groups is empty %}
+      {% include 'partials/empty-state.html.twig' with {
+        title: f.verfuegbarkeit == 'frei' ? 'In diesem Zeitraum ist kein Termin frei.' : 'Hier stehen noch keine Termine.',
+        text: 'Probiert einen anderen Monat oder setzt die Filter zurück. Eure Gruppe möchte einen Abend übernehmen? Dann schlagt einfach ein Wunschdatum vor.',
+        link_url: kneipe.url('/termin-anfragen'),
+        link_text: 'Wunschtermin vorschlagen'
+      } %}
+    {% else %}
+      {% for group in calendar.groups %}
+      <h3 class="calendar__group">{{ group.label }}</h3>
+      <ul class="event-list">
+        {% for event in group.events %}{% include 'partials/event-item.html.twig' with {event: event, level: 4} %}{% endfor %}
+      </ul>
+      {% endfor %}
+    {% endif %}
+
+    {% if f.monat or f.zeitraum %}
+    <p><a class="link-arrow" href="{{ page.url }}">Alle kommenden Termine anzeigen{{ icon('arrow') }}</a></p>
+    {% endif %}
+  </section>
+
+  {% if calendar.past|length %}
+  <section class="calendar__past" aria-labelledby="rueckblick-titel">
+    <h2 id="rueckblick-titel">Rückblick</h2>
+    <p>Diese Abende liegen schon hinter uns.</p>
+    <ul class="event-list event-list--compact">
+      {% for event in calendar.past %}{% include 'partials/event-item.html.twig' with {event: event} %}{% endfor %}
+    </ul>
+    <p><a class="link-arrow" href="{{ page.url }}?zeitraum=vergangen#kalender">Alle vergangenen Termine{{ icon('arrow') }}</a></p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

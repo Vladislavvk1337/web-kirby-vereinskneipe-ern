@@ -1,9 +1,0 @@
-Title: Aktuelles und Rückblicke
-
-----
-
-Intro: Neuigkeiten aus der Kneipe und Rückblicke auf vergangene Abende.
-
-----
-
-Uuid: 3c6bdcddc94f64bf

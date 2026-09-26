@@ -1,0 +1,73 @@
+{#
+  Grundgerüst jeder Seite: <head> mit Titel, Beschreibung, Canonical,
+  Open Graph, lokalen Schriften und CSS; Sprunglink, Kopf mit
+  Hauptnavigation, Inhalt, Fuß.
+
+  Blöcke/Variablen für abgeleitete Templates:
+    meta_title, meta_description, noindex (bool), canonical,
+    styles (Liste zusätzlicher CSS-Dateien), jsonld (Liste), preview (bool)
+#}
+{%- set site_name = kneipe.name -%}
+{%- set is_home = page.home -%}
+{%- set base_title = meta_title ?? (page.header.seotitle ?: page.title) -%}
+{%- set full_title = is_home ? site_name ~ ' – ' ~ kneipe.claim : base_title ~ ' – ' ~ site_name -%}
+{%- set description = meta_description ?? (page.header.seodescription ?: (page.header.teaser ?: (page.header.intro ?: kneipe.description))) -%}
+{%- set description = description|striptags|replace({"\n": ' ', "\r": ' '})|trim -%}
+{%- if description|length > 160 %}{% set description = description|slice(0, 157)|trim ~ '…' %}{% endif -%}
+{%- set canonical = canonical ?? kneipe.absoluteUrl(page.url) -%}
+{%- set robots_noindex = (noindex ?? false) or page.header.noindex or kneipe.noindex or (preview ?? false) or kneipe_preview -%}
+{%- set extra_styles = styles ?? [] -%}
+{%- set jsonld_items = jsonld ?? [] -%}
+{%- if is_home and kneipe.organizationJsonLd %}{% set jsonld_items = jsonld_items|merge([kneipe.organizationJsonLd]) %}{% endif -%}
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ full_title }}</title>
+  <meta name="description" content="{{ description }}">
+  <link rel="canonical" href="{{ canonical }}">
+  {% if robots_noindex %}
+  <meta name="robots" content="noindex, follow">
+  {% endif %}
+
+  <meta property="og:type" content="{{ page.template == 'article' ? 'article' : 'website' }}">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:title" content="{{ is_home ? site_name : base_title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:image" content="{{ og_image ?? kneipe.absoluteUrl(asset('theme://images/brand/og-default.png')) }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <meta name="theme-color" content="#17384f">
+  <link rel="icon" href="{{ asset('theme://images/brand/favicon.svg') }}" type="image/svg+xml">
+  <link rel="icon" href="{{ asset('theme://images/brand/favicon-32.png') }}" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="{{ asset('theme://images/brand/apple-touch-icon.png') }}">
+  <link rel="alternate" type="text/calendar" title="Termine als Kalender (iCalendar)" href="{{ kneipe.url('/termine.ics') }}">
+
+  <link rel="preload" href="{{ asset('theme://fonts/atkinson-hyperlegible-next-latin-var.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ asset('theme://fonts/fraunces-latin-var.woff2') }}" as="font" type="font/woff2" crossorigin>
+  {% for style in ['tokens', 'site']|merge(extra_styles) %}
+  <link rel="stylesheet" href="{{ asset('theme://css/' ~ style ~ '.css') }}">
+  {% endfor %}
+  <link rel="stylesheet" href="{{ asset('theme://css/print.css') }}" media="print">
+  <script src="{{ asset('theme://js/site.js') }}" defer></script>
+  {% for item in jsonld_items %}
+  <script type="application/ld+json">{{ json_ld(item) }}</script>
+  {% endfor %}
+</head>
+<body class="template-{{ page.template }}">
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+  {% if (preview ?? false) or kneipe_preview %}
+  <div class="preview-banner" role="note">{{ icon('lock') }}Vorschau für die Redaktion – dieser Inhalt ist nicht öffentlich sichtbar.</div>
+  {% endif %}
+  {% include 'partials/header.html.twig' %}
+  <main id="inhalt" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+  {% include 'partials/footer.html.twig' %}
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?php
 
-use Kneipe\Calendar;
+use Grav\Plugin\Kneipe\Calendar;
 
 $ts = fn (string $date) => strtotime($date);
 $item = fn (string $id, string $start, string|null $end = null, bool $allDay = false, array $extra = []) => [

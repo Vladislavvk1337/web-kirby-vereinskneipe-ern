@@ -1,0 +1,27 @@
+# Admin2-Formular für Seiten mit Template „error“ (Theme kneipe).
+title: Fehlerseite
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        inhalt:
+          type: tab
+          title: Inhalt
+          fields:
+            admin:
+              type: display
+              markdown: true
+              content: Diese Seite bearbeitet nur die **Administration**.
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            header.text:
+              type: textarea
+              label: Text bei „Seite nicht gefunden“
+              rows: 3

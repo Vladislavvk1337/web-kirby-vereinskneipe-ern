@@ -12,8 +12,8 @@ const path = require('path');
 const { chromium } = require('playwright');
 
 const root = path.resolve(__dirname, '../..');
-const brand = path.join(root, 'assets/brand');
-const fonts = path.join(root, 'assets/fonts');
+const brand = path.join(root, 'user/themes/kneipe/images/brand');
+const fonts = path.join(root, 'user/themes/kneipe/fonts');
 
 // Schriften als Data-URL einbetten (file://-Adressen blockiert Chromium hier)
 const font = (file) => 'data:font/woff2;base64,' + fs.readFileSync(path.join(fonts, file)).toString('base64');

@@ -1,0 +1,42 @@
+# Nicht geheime Einstellungen. Geheimnisse gehören in das Secret
+# kneipe-web-secrets (Vorlage: secret.example.yaml). Alle Variablen: Docker.md
+#
+# Nach Änderungen: kubectl -n <namespace> rollout restart deployment/kneipe-web
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kneipe-web-config
+data:
+  # dev | staging | production
+  GRAV_ENVIRONMENT: production
+  # Grav wertet GRAV_CONFIG__<bereich>__<schlüssel> nur mit GRAV_CONFIG=true aus
+  GRAV_CONFIG: "true"
+  # Öffentliche Adresse (Overlay setzt den echten Wert) – ANNAHME/PLATZHALTER
+  GRAV_CONFIG__system__custom_base_url: https://www.example.org
+
+  # E-Mail-Versand über SMTP – PLATZHALTER, Passwort im Secret
+  GRAV_CONFIG__plugins__email__mailer__engine: smtp
+  GRAV_CONFIG__plugins__email__mailer__smtp__server: smtp.example.org
+  GRAV_CONFIG__plugins__email__mailer__smtp__port: "587"
+  GRAV_CONFIG__plugins__email__mailer__smtp__encryption: tls
+  GRAV_CONFIG__plugins__email__mailer__smtp__user: noreply@example.org
+  GRAV_CONFIG__plugins__email__from: noreply@example.org
+  GRAV_CONFIG__plugins__email__from_name: Ehrenamtskneipe Erndtebrück
+  # Passwort-Links aus Admin2 nur an diese Adresse
+  GRAV_CONFIG__plugins__login__site_host: https://www.example.org
+
+  # Anfrageformular
+  KNEIPE_RATE_LIMIT: "5"
+  KNEIPE_MIN_SECONDS: "3"
+  # Beispielinhalte nur in ein leeres Volume kopieren (Erststart)
+  KNEIPE_SEED_CONTENT: "true"
+  KNEIPE_NOINDEX: "false"
+  KNEIPE_ACCESS_LOG: "false"
+  KNEIPE_LOG_STDERR: "true"
+  # Proxys, deren X-Forwarded-For übernommen wird (Pod-Netz des Ingress-
+  # Controllers). ANNAHME: private Adressbereiche – an den Cluster anpassen.
+  KNEIPE_TRUSTED_PROXIES: "10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
+
+  PHP_MEMORY_LIMIT: 256M
+  PHP_UPLOAD_MAX_FILESIZE: 10M
+  PHP_POST_MAX_SIZE: 12M

@@ -1,0 +1,3 @@
+{# Telefonnummer aus den Stammdaten als Link oder markierter Platzhalter #}
+{% set phone = kneipe.setting('phone') %}
+{% if phone %}{% if icon_before ?? false %}{{ icon('phone') }}{% endif %}<a href="tel:{{ phone|replace({' ': '', '/': '', '(': '', ')': '', '-': ''}) }}">{{ phone }}</a>{% else %}<mark class="placeholder">[Telefonnummer]</mark>{% endif %}

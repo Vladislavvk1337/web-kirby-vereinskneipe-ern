@@ -1,0 +1,30 @@
+{# Über die Ehrenamtskneipe #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% include 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+<div class="container section about">
+  <div class="prose about__text">{{ safe_html(page.content) }}</div>
+  {% if page.header.facts ?? [] %}
+  <aside class="about__facts" aria-labelledby="kurz-titel">
+    <h2 id="kurz-titel" class="h-small">Das Wichtigste in Kürze</h2>
+    <dl class="fact-cards">
+      {% for fact in page.header.facts %}
+      <div><dt>{{ fact.title }}</dt><dd>{{ ktext(fact.text) }}</dd></div>
+      {% endfor %}
+    </dl>
+  </aside>
+  {% endif %}
+</div>
+{% set cover = kneipe.image(page, page.header.cover) %}
+{% if cover %}
+<figure class="photo__figure">{% include 'partials/image.html.twig' with {image: cover, ratio: 16 / 7} %}</figure>
+{% endif %}
+<div class="container section">
+  <aside class="cta-band" aria-labelledby="about-cta">
+    <h2 id="about-cta">Lust, einen Abend zu gestalten?</h2>
+    <p>Jede Gruppe aus Erndtebrück und Umgebung kann eine Thekenschicht übernehmen.</p>
+    <p><a class="button button--primary" href="{{ kneipe.url('/mitmachen') }}">Mitmachen{{ icon('arrow') }}</a></p>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+# Netzwerkzugriffe der Website auf das Nötige beschränken.
+# ANNAHMEN (an den Cluster anpassen):
+#   - Ingress-Controller läuft im Namespace „ingress-nginx“
+#   - DNS (CoreDNS) im Namespace „kube-system“
+#   - SMTP-Server außerhalb des Clusters über Port 587 oder 465
+# Voraussetzung: ein CNI mit NetworkPolicy-Unterstützung (Calico, Cilium …).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kneipe-web
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: http
+          protocol: TCP
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # E-Mail-Versand (SMTP mit STARTTLS bzw. TLS) – nur nach außen
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - port: 587
+          protocol: TCP
+        - port: 465
+          protocol: TCP

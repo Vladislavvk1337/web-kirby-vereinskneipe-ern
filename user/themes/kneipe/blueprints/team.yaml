@@ -1,0 +1,164 @@
+# Admin2-Formular für Seiten mit Template „team“ (Theme kneipe).
+title: Thekenteam
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        team:
+          type: tab
+          title: Team
+          fields:
+            header.title:
+              type: text
+              label: Titel
+              autofocus: true
+              validate:
+                required: true
+            info:
+              type: display
+              markdown: true
+              content: Öffentlich erscheint ein Team nur, wenn es **veröffentlicht** ist **und** die Einwilligung zur Veröffentlichung dokumentiert ist.
+            header.teamtype:
+              type: select
+              label: Art der Gruppe
+              default: verein
+              options:
+                verein: Verein
+                unternehmen: Unternehmen
+                initiative: Initiative
+                privat: Private Gruppe
+            header.consent:
+              type: toggle
+              label: Einwilligung zur Veröffentlichung liegt vor
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool
+            header.teaser:
+              type: textarea
+              label: Kurzvorstellung
+              rows: 3
+              validate:
+                max: 400
+            content:
+              type: markdown
+              label: Ausführliche Vorstellung
+              validate:
+                type: textarea
+                max: 0
+            header.website:
+              type: url
+              label: Website
+              validate:
+                type: url
+            header.social:
+              type: list
+              label: Soziale Netzwerke
+              style: vertical
+              fields:
+                .platform:
+                  type: text
+                  label: Plattform
+                .url:
+                  type: url
+                  label: Adresse
+            header.logo:
+              type: filepicker
+              label: Logo
+              folder: '@self'
+              preview_images: true
+              accept:
+              - .jpg
+              - .jpeg
+              - .png
+              - .webp
+              - .svg
+            header.cover:
+              type: filepicker
+              label: Titelbild
+              folder: '@self'
+              preview_images: true
+              accept:
+              - .jpg
+              - .jpeg
+              - .png
+              - .webp
+            header.gallery:
+              type: list
+              label: Bildergalerie
+              style: vertical
+              fields:
+                .image:
+                  type: filepicker
+                  label: Bild
+                  folder: '@self'
+                  preview_images: true
+                  accept:
+                  - .jpg
+                  - .jpeg
+                  - .png
+                  - .webp
+            header.media_order:
+              type: pagemedia
+              label: Bilder hochladen
+        intern:
+          type: tab
+          title: Intern
+          fields:
+            info_intern:
+              type: display
+              markdown: true
+              content: Diese Angaben erscheinen **nie** auf der Website.
+            header.consentnote:
+              type: textarea
+              label: Nachweis der Einwilligung (wann, wie, von wem)
+              rows: 2
+            header.contactperson:
+              type: text
+              label: Ansprechperson
+            header.contactemail:
+              type: email
+              label: E-Mail
+            header.contactphone:
+              type: text
+              label: Telefon
+            header.internalnote:
+              type: textarea
+              label: Interne Notiz
+              rows: 4
+            header.createdby:
+              type: text
+              label: Angelegt von
+              readonly: true
+            header.createdat:
+              type: text
+              label: Angelegt am
+              readonly: true
+            header.modifiedby:
+              type: text
+              label: Zuletzt geändert von
+              readonly: true
+            header.modifiedat:
+              type: text
+              label: Zuletzt geändert am
+              readonly: true
+        optionen:
+          type: tab
+          title: Veröffentlichung
+          fields:
+            header.published:
+              type: toggle
+              label: Veröffentlicht
+              default: 0
+              highlight: 1
+              options:
+                1: Ja
+                0: Nein
+              validate:
+                type: bool

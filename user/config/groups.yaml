@@ -1,0 +1,48 @@
+# Benutzergruppen. Konten werden im Admin (Benutzer) oder per CLI angelegt
+# und einer Gruppe zugeordnet (Docker.md, docs/editor-guide.md).
+#
+# Seitenbezogene Sperren stehen zusätzlich im Frontmatter der Seiten
+# (permissions:), die Regeln des Freigabeworkflows setzt das Plugin
+# „kneipe“ serverseitig durch (user/plugins/kneipe/classes/Workflow.php).
+administration:
+  readableName: Administration
+  description: 'Alle Inhalte, Freigabe, Rechtstexte, Stammdaten, Einstellungen und Benutzer'
+  icon: user-shield
+  enabled: true
+  access:
+    site:
+      login: true
+    api:
+      access: true
+      pages:
+        read: true
+        write: true
+      media:
+        read: true
+        write: true
+      users:
+        read: true
+        write: true
+      system:
+        read: true
+      reports:
+        read: true
+    kneipe:
+      admin: true
+
+moderation:
+  readableName: Moderation
+  description: 'Termine, Thekenteams und Aktuelles pflegen und zur Freigabe vorbereiten; Anfragen bearbeiten'
+  icon: user-pen
+  enabled: true
+  access:
+    site:
+      login: true
+    api:
+      access: true
+      pages:
+        read: true
+        write: true
+      media:
+        read: true
+        write: true

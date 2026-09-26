@@ -1,0 +1,9 @@
+{# Einfache Textseite #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% include 'partials/page-head.html.twig' with {title: page.title} %}
+<div class="container container--narrow section">
+  <div class="prose">{{ safe_html(page.content) }}</div>
+</div>
+{% endblock %}

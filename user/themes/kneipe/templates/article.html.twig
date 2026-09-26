@@ -1,0 +1,29 @@
+{# Meldung oder Rückblick #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set cover = kneipe.image(page, page.header.cover) %}
+{% set event = kneipe.publicEventByRoute(page.header.event ?? '') %}
+{% set date = kneipe.timestamp(page.header.date) %}
+<article>
+  {% include 'partials/page-head.html.twig' with {
+    title: page.title,
+    eyebrow: (page.header.kind == 'rueckblick' ? 'Rückblick' : 'Meldung') ~ (date ? ' · ' ~ kneipe.formatDate(date, 'd. MMMM y') : ''),
+    back: {url: kneipe.url('/aktuelles'), text: 'Aktuelles'}
+  } %}
+  <div class="container container--narrow section">
+    {% if page.header.teaser %}<p class="lead">{{ ktext(page.header.teaser) }}</p>{% endif %}
+    {% if cover %}
+    <figure class="article__cover">
+      {% include 'partials/image.html.twig' with {image: cover, ratio: 1.5, lazy: false, sizes: '(min-width: 48em) 46rem, 100vw'} %}
+      {% if kneipe.imageMeta(cover, 'caption') %}<figcaption>{{ ktext(kneipe.imageMeta(cover, 'caption')) }}</figcaption>{% endif %}
+    </figure>
+    {% endif %}
+    <div class="prose">{{ safe_html(page.content) }}</div>
+    {% if event %}
+    <p class="article__event">{{ icon('calendar') }}Zum Termin: <a href="{{ event.url }}">{{ event.publicTitle }}</a></p>
+    {% endif %}
+    {% include 'partials/gallery.html.twig' with {images: kneipe.images(page, page.header.gallery), heading_id: 'artikel-bilder'} %}
+  </div>
+</article>
+{% endblock %}

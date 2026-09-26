@@ -1,0 +1,12 @@
+# Namensraum der Website. Die Overlays setzen den Namen je Umgebung
+# (kneipe-dev, kneipe-staging, kneipe). Pod Security Standard „restricted“
+# wird erzwungen – das Deployment erfüllt ihn.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kneipe
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

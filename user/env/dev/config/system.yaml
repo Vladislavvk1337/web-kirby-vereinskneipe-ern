@@ -1,0 +1,15 @@
+# Lokale Entwicklung (GRAV_ENVIRONMENT=dev)
+errors:
+  display: 1
+  log: true
+twig:
+  cache: true
+  debug: true
+  auto_reload: true
+cache:
+  check:
+    method: file
+debugger:
+  enabled: false
+session:
+  secure: false

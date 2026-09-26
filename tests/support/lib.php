@@ -99,22 +99,50 @@ function remove_dir(string $dir): void
 		return;
 	}
 
+	// Symlinks (z. B. auf user/config im Repository) nur entfernen, nie hineingehen
 	foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $item) {
-		$item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+		$item->isLink() || !$item->isDir() ? unlink($item->getPathname()) : rmdir($item->getPathname());
 	}
 
 	rmdir($dir);
 }
 
-// Reine Klassen des Plugins ohne Kirby laden
+// Klassen des Plugins laden (reine Klassen brauchen kein Grav)
 spl_autoload_register(function (string $class): void {
-	if (str_starts_with($class, 'Kneipe\\')) {
-		$file = dirname(__DIR__, 2) . '/site/plugins/kneipe/src/' . substr($class, 7) . '.php';
+	$prefix = 'Grav\\Plugin\\Kneipe\\';
+
+	if (str_starts_with($class, $prefix)) {
+		$file = dirname(__DIR__, 2) . '/user/plugins/kneipe/classes/' . substr($class, strlen($prefix)) . '.php';
 
 		if (is_file($file)) {
 			require $file;
 		}
 	}
 });
+
+/** Grav-Kern für Tests (scripts/dev-server.sh baut ihn unter .grav/grav) */
+function grav_root(): ?string
+{
+	$root = getenv('GRAV_TEST_ROOT') ?: dirname(__DIR__, 2) . '/.grav/grav';
+
+	return is_file($root . '/vendor/autoload.php') ? $root : null;
+}
+
+/** symfony/yaml aus dem Grav-Kern, falls vorhanden */
+function load_grav_vendor(): bool
+{
+	static $loaded = null;
+
+	if ($loaded === null) {
+		$root   = grav_root();
+		$loaded = $root !== null;
+
+		if ($loaded) {
+			require_once $root . '/vendor/autoload.php';
+		}
+	}
+
+	return $loaded;
+}
 
 date_default_timezone_set('Europe/Berlin');

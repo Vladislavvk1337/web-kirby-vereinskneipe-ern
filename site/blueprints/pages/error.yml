@@ -1,9 +1,0 @@
-title: Fehlerseite
-icon: alert
-extends: options/admin-only
-
-fields:
-  text:
-    label: Text
-    type: textarea
-    buttons: false

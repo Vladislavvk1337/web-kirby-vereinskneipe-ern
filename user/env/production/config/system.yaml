@@ -1,0 +1,13 @@
+# Produktion (GRAV_ENVIRONMENT=production)
+errors:
+  display: 0
+  log: true
+twig:
+  cache: true
+  debug: false
+  auto_reload: false
+cache:
+  check:
+    method: file
+session:
+  secure: true

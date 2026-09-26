@@ -1,6 +1,6 @@
 <?php
 
-use Kneipe\Ics;
+use Grav\Plugin\Kneipe\Ics;
 
 $event = [
 	'uid'         => 'abc123@example.org',

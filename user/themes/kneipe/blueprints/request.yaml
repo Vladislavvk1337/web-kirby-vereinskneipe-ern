@@ -1,0 +1,101 @@
+# Admin2-Formular für Seiten mit Template „request“ (Theme kneipe).
+title: Terminanfrage
+form:
+  validation: loose
+  fields:
+    tabs:
+      type: tabs
+      active: 1
+      fields:
+        anfrage:
+          type: tab
+          title: Anfrage
+          fields:
+            info:
+              type: display
+              markdown: true
+              content: Angaben aus dem Formular – nur lesbar. Die Anfrage wird nie veröffentlicht und nach Ablauf der Löschfrist automatisch gelöscht. Bitte keine Daten an Dritte weitergeben.
+            header.title:
+              type: text
+              label: Titel
+              readonly: true
+            header.slotlabel:
+              type: text
+              label: Gewünschter Termin
+              readonly: true
+            header.slotpage:
+              type: text
+              label: Termin im Kalender (Route)
+              readonly: true
+            header.wishdate:
+              type: text
+              label: Eigener Datumsvorschlag
+              readonly: true
+            header.altdate:
+              type: text
+              label: Alternativer Termin
+              readonly: true
+            header.groupname:
+              type: text
+              label: Gruppe
+              readonly: true
+            header.grouptype:
+              type: select
+              label: Art der Gruppe
+              disabled: true
+              options:
+                verein: Verein
+                unternehmen: Unternehmen
+                initiative: Initiative
+                privat: Private Gruppe
+            header.contactname:
+              type: text
+              label: Kontaktperson
+              readonly: true
+            header.email:
+              type: text
+              label: E-Mail
+              readonly: true
+            header.phone:
+              type: text
+              label: Telefon
+              readonly: true
+            header.submittedat:
+              type: text
+              label: Eingegangen am
+              readonly: true
+            header.intro:
+              type: textarea
+              label: Kurze Vorstellung
+              readonly: true
+              rows: 3
+            header.message:
+              type: textarea
+              label: Nachricht
+              readonly: true
+              rows: 4
+            header.privacy:
+              type: text
+              label: Datenschutz
+              readonly: true
+        bearbeitung:
+          type: tab
+          title: Bearbeitung
+          fields:
+            header.processing:
+              type: select
+              label: Bearbeitungsstand
+              default: neu
+              options:
+                neu: neu
+                inbearbeitung: in Bearbeitung
+                terminangelegt: Termin angelegt
+                abgelehnt: abgelehnt
+                erledigt: erledigt
+            header.handledby:
+              type: text
+              label: Bearbeitet von
+            header.processingnote:
+              type: textarea
+              label: Interne Notiz
+              rows: 4

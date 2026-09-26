@@ -1,0 +1,35 @@
+{# Übersicht der Thekenteams – nur Teams mit Einwilligung #}
+{% extends 'partials/base.html.twig' %}
+
+{% block content %}
+{% set teams = kneipe.publicTeams %}
+{% include 'partials/page-head.html.twig' with {title: page.title, intro: page.header.intro} %}
+<div class="container section">
+  {% if teams|length %}
+  <ul class="team-grid">
+    {% for team in teams %}
+    <li class="team-card">
+      <div class="team-card__logo">
+        {% if team.logo %}{% include 'partials/image.html.twig' with {image: team.logo, width: 96, height: 96} %}{% else %}{{ icon('users') }}{% endif %}
+      </div>
+      <h2 class="team-card__title"><a href="{{ team.url }}">{{ team.title }}</a></h2>
+      <p class="team-card__type">{{ team.typeLabel }}</p>
+      {% if team.teaser %}<p>{{ ktext(team.teaser) }}</p>{% endif %}
+      {% set next = team.upcomingEvents|first %}
+      {% if next %}
+      <p class="team-card__next">{{ icon('calendar') }}Nächster Abend: {{ kneipe.formatDate(next.startTimestamp, 'd. MMMM') }}</p>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  {% include 'partials/empty-state.html.twig' with {title: 'Hier stellen sich bald die Thekenteams vor.', text: 'Eure Gruppe könnte die erste sein.', link_url: kneipe.url('/mitmachen'), link_text: 'So könnt ihr mitmachen'} %}
+  {% endif %}
+
+  <aside class="cta-band" aria-labelledby="teams-cta">
+    <h2 id="teams-cta">Eure Gruppe fehlt noch?</h2>
+    <p>Vereine, Initiativen, Unternehmen und private Gruppen können einen Abend übernehmen.</p>
+    <p><a class="button button--primary" href="{{ kneipe.url('/termin-anfragen') }}">Termin anfragen{{ icon('arrow') }}</a></p>
+  </aside>
+</div>
+{% endblock %}
